@@ -1,0 +1,22 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    padding-left: 2em;
+}
+
+.name {
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 6em;
+}
+
+.links {
+    font-size: 5em;
+    line-height: 1.5em;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
