@@ -1,0 +1,17 @@
+body{
+    text-align: center;
+}
+
+a{
+    font-size: 3em;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-decoration: none;
+    color: #8C1217;
+    font-weight: bold;
+}
+
+a:hover{
+    color: #B0171D;
+    text-decoration: underline;
+}
