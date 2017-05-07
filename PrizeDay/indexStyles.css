@@ -2,13 +2,16 @@ body{
     text-align: center;
 }
 
-a{
-    font-size: 3em;
-    margin-left: 10px;
-    margin-right: 10px;
+a {
     text-decoration: none;
     color: #8C1217;
     font-weight: bold;
+}
+
+#forms > a{
+    font-size: 3em;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 a:hover{
