@@ -11,17 +11,24 @@ a:hover {
     color: #1DB954;
 }
 
+#main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
 .svgDiv {
-    display: block;
     width: 300px;
     height: 450px;
     background-color: #FDFDFD;
-    /*box-shadow: 0 15px 33px 0 rgba(0,0,0,0.9);*/
+    box-shadow: 0 15px 33px 0 rgba(0,0,0,0.9);
 
+    margin-bottom: 30px;
 }
 
 .trackInfo {
-    display: block;
+    /*display: block;*/
     width: 90%;
     margin-left: auto;
     margin-right: auto;

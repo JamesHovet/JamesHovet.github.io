@@ -25,6 +25,10 @@
             </filter>
         </defs>
     </svg>
+
+    <div id="main">
+    </div>
+
 </body>
 
 <script>
@@ -34,14 +38,16 @@
     if(hash == ""){
         console.log("NO TOKEN")
         //TODO Fail gracefully
-        hash = "#access_token=BQCCXf6Q3DS2gFOn6-5Ts7KPgVH2JZDbnQ1sMB46GcL3lFpLCb-95HpbWJtt8WaerawlSGtiFWnbki8VCZOJ7Bd5WtXZq5BvI4GLg1k9aCGKrsth2G8dYRVL6S3fYIU-LObvcuAHaTF9cl7aTaEzq9TUpO67laascfGWRXIL_aM4I4GGK9gUX1_wCF341vs_vaRjZWfZoN781R7y5rpxbXs6ZjoD9NGfXCOAhzilf4mFmhfotV0KhR-buEgjfAVECwyzrr0TpfifEqwp8Nc8qbIoKnDw49mQRK7KgsKiWBqmYakQdivFiw2nwSqdISmf3Q&token_type=Bearer&expires_in=3600"
+        // hash = "#access_token=BQCCXf6Q3DS2gFOn6-5Ts7KPgVH2JZDbnQ1sMB46GcL3lFpLCb-95HpbWJtt8WaerawlSGtiFWnbki8VCZOJ7Bd5WtXZq5BvI4GLg1k9aCGKrsth2G8dYRVL6S3fYIU-LObvcuAHaTF9cl7aTaEzq9TUpO67laascfGWRXIL_aM4I4GGK9gUX1_wCF341vs_vaRjZWfZoN781R7y5rpxbXs6ZjoD9NGfXCOAhzilf4mFmhfotV0KhR-buEgjfAVECwyzrr0TpfifEqwp8Nc8qbIoKnDw49mQRK7KgsKiWBqmYakQdivFiw2nwSqdISmf3Q&token_type=Bearer&expires_in=3600"
 
+        var token = "BQDx2o4sHp90CsMHuEmVUTwM_JenKtgwVLYvfmn8NkCS6f77M8Li3uBczs4fAdSiQWg3MG7ldX38iIlGZr4-u-T0T_dDr2LikrJy1U2akYTENDjQIWI6crqdRPGOygSIO5SBwGUPcUdV1Dq14_OEgeXcvNWUN578SWV9f1tanjBXhnTiIdDoX0GAhPRjiKbR4wiXErZ_UZZ0l9bNTVyTs3lxL9nmQNMGkivaGFm2oEYnhDytV5mpu19y-pWTbLtpHmPMhk2Zp6L3DcZnNR_5eam4k68kdptIeIkcrE1Oz_eVY-DYyI08rMviofXRLPo8-Q"
+
+    } else {
+
+        //parse TOKEN
+        var token = partsOfStr = hash.split('&')[0].substring(14);
+        console.log(token)
     }
-
-    //parse TOKEN
-    var token = partsOfStr = hash.split('&')[0].substring(14);
-    console.log(token)
-
     //get a playlist
 
     function getPlaylist(user,id) {
@@ -61,7 +67,9 @@
     }
 
     function testGetPlaylist() {
-        getPlaylist("jrhovet","5iHCRy51LHHa68LnYPxf1X")
+        // getPlaylist("jrhovet","5iHCRy51LHHa68LnYPxf1X")
+        getPlaylist("jrhovet","0yfJRKOO08gmf4RfgDKzoM")
+
     }
 
     function handlePlaylist(res) {
@@ -74,44 +82,35 @@
         // createTileDiv(res.items[4].track,4)
 
         res.items.forEach(function(item,index) {
-            createTileDiv(item.track,index)
+            try {
+                createTileDiv(item.track,index)
+            }
+            catch(err){
+                console.log("error getting track info for: ")
+                console.log(item.track)
+            }
         })
 
     }
     //TODO Fix
-    testGetPlaylist()
+    // testGetPlaylist()
 
-    // var query = "Sympathy for the devil"
-    // var query
-    //
-    // if(window.location.search != ""){
-    //     query = window.location.search.substring(3)
-    // } else {
-    //     query = "Good times bad times celebration"
-    // }
 
-    // var query = "Good times bad times celebration"
+    var query
 
-    // $.ajax({
-    //     url: 'https://api.spotify.com/v1/search?q=' + query + '&type=track',
-    //     headers: {
-    //        'Authorization': 'Bearer ' + token
-    //     },
-    //     success: function(response) {
-    //         getTrack(response)
-    //     }
-    // });
+    if(window.location.search != ""){
+        query = window.location.search.substring(3)
+    } else {
+        query = "0yfJRKOO08gmf4RfgDKzoM"
+    }
 
-    var testTrack
+    getPlaylist("jrhovet",query)
 
     function getTrackSpec(rawTrack) {
-        testTrack = rawTrack
-        // console.log(rawTrack)
         track = rawTrack
 
         this.t = {}
 
-        // var id = track["id"]
         t.id = track["id"]
         t.current_url = track["album"]["images"][1]["url"]
         t.current_name = track["name"]
@@ -123,17 +122,6 @@
         t.current_artist_href = track["artists"][0]["external_urls"]["spotify"]
         return t
     }
-
-    var clipPaths=[
-        "M0,0 L 0,-100 L 100,-100  Z",
-        "M0,0 L 100,0  L 100,-100  Z",
-        "M0,0 L 100,0  L 100,100   Z",
-        "M0,0 L 0,100  L 100,100   Z",
-        "M0,0 L 0,100  L -100,100  Z",
-        "M0,0 L -100,0 L -100,100  Z",
-        "M0,0 L -100,0 L -100,-100 Z",
-        "M0,0 L 0,-100 L -100,-100 Z"
-    ]
 
     function createTileDiv(track,index) {
         this.div = $("<div>", {id: "svgDiv_" + index, class: "svgDiv"})
@@ -147,7 +135,7 @@
         this.div.append(this.trackInfoDiv)
 
         // console.log(track)
-        $("body").append(div)
+        $("#main").append(div)
 
         this.t = getTrackSpec(track)
         console.log(t)
@@ -168,18 +156,6 @@
                 }
             });
     }
-
-    // function getStats(t,index) {
-    //     $.ajax({
-    //         url: 'https://api.spotify.com/v1/audio-features/' + t.id,
-    //         headers: {
-    //            'Authorization': 'Bearer ' + token
-    //         },
-    //         success: function(response) {
-    //             handleGetStats(response, index)
-    //         }
-    //     });
-    // }
 
     function handleGetStats(res,t, index) {
         // console.log(res)
