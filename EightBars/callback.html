@@ -1,28 +1,31 @@
 <!DOCTYPE HTML>
 <head>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
-    <script src="../scripts/d3.min.js"></script>
-    <script src="../scripts/Vibrant.min.js"></script>
-    <script src="../scripts/color-thief.js"></script>
+    <script src="scripts/d3.min.js"></script>
+    <script src="scripts/Vibrant.min.js"></script>
+    <script src="scripts/helpers.js"></script>
+    <script src="scripts/draw.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="EightBarsStyles.css" rel="stylesheet">
 </head>
 
 <body>
+    <!--Defs for SVG effects for every tile-->
+    <svg width="0" height="0">
+        <defs>
+            <filter id="f1" x="0" y="0">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+                <feColorMatrix
+                    type="matrix"
+                    values=".3   0   0   0   0
+                             0  .3   0   0   0
+                             0   0  .3   0   0
+                             0   0   0   1   0 "/>
 
-    <div id="svgDiv">
-        <svg width="400" height="400">
-            <g transform="scale(2)">
-                <g transform="translate(100,100)" id="set0">
-                </g>
-            </g>
-        </svg>
-    </div>
+            </filter>
+        </defs>
+    </svg>
 </body>
-
-<style>
-
-
-</style>
 
 <script>
 
@@ -31,7 +34,7 @@
     if(hash == ""){
         console.log("NO TOKEN")
         //TODO Fail gracefully
-        hash = "#access_token=BQBq2onlI2lf74UKlFhkUWoX_W3_zRAyfUrx2oqVgedI0A0XJ6xPq4cS0bc0Icz7rSG_UHDjidbawV3D2t1jhyj360BxDZ9JcGeB4xIw8ZHZikFwW7UdOU3_OHtHlHC6Qr2BDYqxUnkvTxttbtDmDzpAcVURFvzzsdtpvSy5Juk&token_type=Bearer&expires_in=3600"
+        hash = "#access_token=BQCCXf6Q3DS2gFOn6-5Ts7KPgVH2JZDbnQ1sMB46GcL3lFpLCb-95HpbWJtt8WaerawlSGtiFWnbki8VCZOJ7Bd5WtXZq5BvI4GLg1k9aCGKrsth2G8dYRVL6S3fYIU-LObvcuAHaTF9cl7aTaEzq9TUpO67laascfGWRXIL_aM4I4GGK9gUX1_wCF341vs_vaRjZWfZoN781R7y5rpxbXs6ZjoD9NGfXCOAhzilf4mFmhfotV0KhR-buEgjfAVECwyzrr0TpfifEqwp8Nc8qbIoKnDw49mQRK7KgsKiWBqmYakQdivFiw2nwSqdISmf3Q&token_type=Bearer&expires_in=3600"
 
     }
 
@@ -39,101 +42,146 @@
     var token = partsOfStr = hash.split('&')[0].substring(14);
     console.log(token)
 
+    //get a playlist
 
-    // var current_url = "https://i.scdn.co/image/b0da4d3af09485434503aec6c83817df0c38f6ef"
-
-    // var current_url = "https://i.scdn.co/image/4df3b334d17428ba101ac867e6f97a0196af1635"
-    var current_url
-    var data
-    var darkColor = "#1B1B1B"
-
-    var w = 1400;
-    var h = 400;
-
-    var songIndex = 0
-
-    function httpGetAsync(theUrl, callback)
-    {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function() {
-            if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-                callback(xmlHttp.responseText);
-        }
-        xmlHttp.open("GET", theUrl, true); // true for asynchronous
-        xmlHttp.send(null);
-    }
-
-    function fancyTimeFormat(time)
-    {
-        //from https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
-        // Hours, minutes and seconds
-        var mins = ~~((time % 3600) / 60);
-        var secs = time % 60;
-
-        // Output like "1:01" or "4:03:59" or "123:03:59"
-        var ret = "";
-
-        ret += "" + mins + ":" + (secs < 10 ? "0" : "");
-        ret += "" + Math.floor(secs);
-        return ret;
-    }
-
-    //functions
-
-    //do search
-
-    // var query = "Sympathy for the devil"
-    var query
-
-    if(window.location.search != ""){
-        query = window.location.search.substring(3)
-    } else {
-        query = "Good times bad times celebration"
-    }
-
-    // var query = "Good times bad times celebration"
-
-    $.ajax({
-        url: 'https://api.spotify.com/v1/search?q=' + query + '&type=track',
-        headers: {
-           'Authorization': 'Bearer ' + token
-        },
-        success: function(response) {
-            getTrack(response)
-        }
-    });
-
-    function getTrack(res) {
-        var track = res["tracks"]["items"][0]
-        console.log(track)
-
-        var id = track["id"]
-        current_url = track["album"]["images"][1]["url"]
-        current_name = track["name"]
-        current_durration = fancyTimeFormat(track["duration_ms"]/1000)
-        current_album = track["album"]["name"]
-        current_artist = track["artists"][0]["name"]
-        console.log(current_name)
-        console.log(current_album)
-        console.log(current_artist)
-        console.log(current_durration)
-
-        getStats(id)
-    }
-
-    function getStats(id) {
+    function getPlaylist(user,id) {
         $.ajax({
-            url: 'https://api.spotify.com/v1/audio-features/' + id,
+            url: "https://api.spotify.com/v1/users/"
+            + user
+            + "/playlists/"
+            + id
+            +"/tracks?fields=items(track(name,id,duration,external_urls,preview_url,album(name,images,external_urls),artists(name,external_urls)))&limit=100",
             headers: {
                'Authorization': 'Bearer ' + token
             },
             success: function(response) {
-                updateBars(response, 0)
+                handlePlaylist(response)
             }
         });
     }
 
-    function updateBars(res, index) {
+    function testGetPlaylist() {
+        getPlaylist("jrhovet","5iHCRy51LHHa68LnYPxf1X")
+    }
+
+    function handlePlaylist(res) {
+        console.log(res)
+        // getTrack(res.items[0].track,0)
+        // createTileDiv(res.items[0].track,0)
+        // createTileDiv(res.items[1].track,1)
+        // createTileDiv(res.items[2].track,2)
+        // createTileDiv(res.items[3].track,3)
+        // createTileDiv(res.items[4].track,4)
+
+        res.items.forEach(function(item,index) {
+            createTileDiv(item.track,index)
+        })
+
+    }
+    //TODO Fix
+    testGetPlaylist()
+
+    // var query = "Sympathy for the devil"
+    // var query
+    //
+    // if(window.location.search != ""){
+    //     query = window.location.search.substring(3)
+    // } else {
+    //     query = "Good times bad times celebration"
+    // }
+
+    // var query = "Good times bad times celebration"
+
+    // $.ajax({
+    //     url: 'https://api.spotify.com/v1/search?q=' + query + '&type=track',
+    //     headers: {
+    //        'Authorization': 'Bearer ' + token
+    //     },
+    //     success: function(response) {
+    //         getTrack(response)
+    //     }
+    // });
+
+    var testTrack
+
+    function getTrackSpec(rawTrack) {
+        testTrack = rawTrack
+        // console.log(rawTrack)
+        track = rawTrack
+
+        this.t = {}
+
+        // var id = track["id"]
+        t.id = track["id"]
+        t.current_url = track["album"]["images"][1]["url"]
+        t.current_name = track["name"]
+        t.current_durration = fancyTimeFormat(track["duration_ms"]/1000)
+        t.current_album = track["album"]["name"]
+        t.current_artist = track["artists"][0]["name"]
+        t.current_href = track["external_urls"]["spotify"]
+        t.current_album_href = track["album"]["external_urls"]["spotify"]
+        t.current_artist_href = track["artists"][0]["external_urls"]["spotify"]
+        return t
+    }
+
+    var clipPaths=[
+        "M0,0 L 0,-100 L 100,-100  Z",
+        "M0,0 L 100,0  L 100,-100  Z",
+        "M0,0 L 100,0  L 100,100   Z",
+        "M0,0 L 0,100  L 100,100   Z",
+        "M0,0 L 0,100  L -100,100  Z",
+        "M0,0 L -100,0 L -100,100  Z",
+        "M0,0 L -100,0 L -100,-100 Z",
+        "M0,0 L 0,-100 L -100,-100 Z"
+    ]
+
+    function createTileDiv(track,index) {
+        this.div = $("<div>", {id: "svgDiv_" + index, class: "svgDiv"})
+        this.svg = $("<svg width='300' height='300'>")
+        div.append(this.svg)
+        this.trackInfoDiv = $("<div class='trackInfo'>")
+        this.trackInfoDiv.append($("<h1 class='songTitle'><a href='null'>Loading</a></h1>"))
+        this.trackInfoDiv.append($("<h1 class='artist'><a href='null'>Loading</a></h1>"))
+        this.trackInfoDiv.append($("<h1 class='albumTitle'><a href='null'>Loading</a></h1>"))
+
+        this.div.append(this.trackInfoDiv)
+
+        // console.log(track)
+        $("body").append(div)
+
+        this.t = getTrackSpec(track)
+        console.log(t)
+
+        getStatsAndDraw(this.t,index)
+
+    }
+
+    function getStatsAndDraw(t,index) {
+
+        $.ajax({
+                url: 'https://api.spotify.com/v1/audio-features/' + t.id,
+                headers: {
+                   'Authorization': 'Bearer ' + token
+                },
+                success: function(response) {
+                    handleGetStats(response,t, index)
+                }
+            });
+    }
+
+    // function getStats(t,index) {
+    //     $.ajax({
+    //         url: 'https://api.spotify.com/v1/audio-features/' + t.id,
+    //         headers: {
+    //            'Authorization': 'Bearer ' + token
+    //         },
+    //         success: function(response) {
+    //             handleGetStats(response, index)
+    //         }
+    //     });
+    // }
+
+    function handleGetStats(res,t, index) {
         // console.log(res)
         //values
         /*
@@ -157,165 +205,9 @@
             res["instrumentalness"],
             (res["key"] + 1)/13
         ]
-
-        data = this.data
-        draw()
+        draw(t,index,this.data)
     }
 
-
-
-    // data=[10,50,30]
-
-    var clipPaths=[
-        "M0,0 L 0,-100 L 100,-100  Z",
-        "M0,0 L 100,0  L 100,-100  Z",
-        "M0,0 L 100,0  L 100,100   Z",
-        "M0,0 L 0,100  L 100,100   Z",
-        "M0,0 L 0,100  L -100,100  Z",
-        "M0,0 L -100,0 L -100,100  Z",
-        "M0,0 L -100,0 L -100,-100 Z",
-        "M0,0 L 0,-100 L -100,-100 Z"
-    ]
-
-    // var img = new Image;
-    //
-    // img.onload = {};
-    // img.crossOrigin = '';
-    // img.src = current_url
-    // img.width = 300
-    // img.height = 300
-
-    // var colorThief = new ColorThief();
-    // var barColor = rgb(colorThief.getColor(img))
-
-    function draw() {
-
-        console.log(data)
-
-        var img = document.createElement('img');
-        img.crossOrigin = '';
-        img.setAttribute('src', current_url)
-        // document.body.appendChild(img)
-
-        var barColor
-        var darkColor = "blue"
-        var neutralColor = "#222222"
-
-        img.addEventListener('load', function() {
-            var vibrant = new Vibrant(img);
-            var swatches = vibrant.swatches()
-            barColor = swatches["Vibrant"].getHex()
-            // darkColor = swatches["DarkVibrant"].getHex()
-
-            function rgb(values) {
-                return 'rgb(' + values.join(', ') + ')';
-            }
-
-
-            var colorThief = new ColorThief();
-            var pal = colorThief.getPalette(img,2)
-            // barColor = rgb(pal[0])
-            darkColor = rgb(pal[0])
-
-            var bars_g = document.getElementById("bars_" + String(songIndex))
-            bars_g.setAttribute("fill",barColor)
-            var path_g_current = document.getElementById("path_g_" + String(songIndex))
-            path_g_current.setAttribute("stroke", neutralColor)
-            var bk_current = document.getElementById("bk_" + String(songIndex))
-            bk_current.setAttribute("fill", neutralColor)
-            var rect_bk_current = document.getElementById("rect_bk_" + String(songIndex))
-            rect_bk_current.setAttribute("fill",darkColor)
-
-
-        });
-
-
-
-        //start main d3 stuff
-        var vis = d3.select("svg").append("g").attr("transform","translate(100,100)");
-        var vis = d3.select("#set0")
-
-        vis.append("rect")
-            .attr("id","rect_bk_" + String(songIndex))
-            .attr("fill",darkColor)
-            .attr("x","-50%")
-            .attr("y","-50%")
-            .attr("width","100%")
-            .attr("height","100%")
-
-
-        vis.append("defs")
-            .append('pattern')
-            .attr('id', 'albumCover')
-            .attr('patternContentUnits', 'objectBoundingBox')
-            .attr('width', "100%")
-            .attr('height', "100%")
-            .append("image")
-            .attr("xlink:href", current_url)
-            .attr('width', 1)
-            .attr('height', 1)
-
-        //draw dial outer circle
-        vis.append("circle")
-            .attr("id","bk_" + String(songIndex))
-            .attr("cx",0)
-            .attr("cy",0)
-            .attr("fill",darkColor)
-            .attr("r",100/2.1 + 50)
-
-
-        //create the clip paths
-        vis.selectAll("clipPath")
-            .data(clipPaths)
-            .enter()
-            .append("clipPath")
-            .attr("id", (d,i) => {return"tri" + i+ "_" + String(songIndex)})
-            .append("path")
-            .attr("d",(d) => {return d})
-
-        vis.append("g")
-            .attr("id","bars_" + String(songIndex))
-            .attr("fill","white")
-            .selectAll("circle")
-            .data(data)
-            .enter()
-            .append("circle")
-            .attr("cx",0)
-            .attr("cy",0)
-            .attr("r",(d) => {return (d*100)/2.1 + 50})
-            .attr("clip-path",(d,i) => {return"url(#tri" + i+ "_" + String(songIndex) + ")"})
-            .attr("fill",barColor)
-
-        //clip radial lines
-
-        vis.append("clipPath")
-            .attr("id","circle_clip_" + String(songIndex))
-            .append("circle")
-            .attr("cx",0)
-            .attr("cy",0)
-            .attr("r",100/2.1 + 50)
-
-
-        vis.append("g")
-            .attr("id","path_g_" + String(songIndex))
-            .attr("fill","none")
-            .attr("stroke",darkColor)
-            .attr("stroke-width","5")
-            .selectAll("path")
-            .data(clipPaths)
-            .enter()
-            .append("path")
-            .attr("d",(d)=> {return d})
-            .attr("clip-path","url(#circle_clip_" + String(songIndex) +")")
-
-        //album cover
-        vis.append("circle")
-            .attr("cx",0)
-            .attr("cy",0)
-            .attr("r",50)
-            .attr("fill","url(#albumCover)")
-            .attr("stroke","white")
-            .attr("stroke-width","5")
-    }
+    // testCreateTileDiv()
 
 </script>
