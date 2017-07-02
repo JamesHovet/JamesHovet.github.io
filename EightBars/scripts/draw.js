@@ -1,3 +1,14 @@
+var clipPaths=[
+    "M0,0 L 0,-100 L 100,-100  Z",
+    "M0,0 L 100,0  L 100,-100  Z",
+    "M0,0 L 100,0  L 100,100   Z",
+    "M0,0 L 0,100  L 100,100   Z",
+    "M0,0 L 0,100  L -100,100  Z",
+    "M0,0 L -100,0 L -100,100  Z",
+    "M0,0 L -100,0 L -100,-100 Z",
+    "M0,0 L 0,-100 L -100,-100 Z"
+]
+
 function draw(t,index,data) {
 
     // console.log(data)
@@ -33,13 +44,6 @@ function draw(t,index,data) {
 
     });
 
-
-
-    //start main d3 stuff
-    // var vis = d3.select("svg").append("g").attr("transform","translate(100,100)");
-    // var vis = d3.select("#svgDiv_" + String(index))
-
-    // var vis = d3.select("#svgDiv_" + String(index)).select("svg").select("g").select("g")
     var vis = d3.select("#svgDiv_" + String(index))
         .select("svg")
         .append("g")
@@ -47,14 +51,6 @@ function draw(t,index,data) {
         .append("g")
         .attr("transform","translate(100,100)")
         .attr("id","set_" + String(index))
-
-
-    // var vis = d3.select()
-
-    console.log(vis)
-    // console.log(document.getElementById("svgDiv_0"))
-
-    vis.attr("id","didThisWork")
 
     vis.append("defs")
         .append('pattern')
@@ -152,26 +148,4 @@ function draw(t,index,data) {
     info.select(".albumTitle a")
         .attr("href",t.current_album_href)
         .html(t.current_album)
-}
-
-function createTileDiv(track,index) {
-    this.div = $("<div>", {id: "svgDiv_" + index, class: "svgDiv"})
-
-    this.svg = $("<svg width='300' height='300'>")
-
-    div.append(this.svg)
-
-    this.trackInfoDiv = $("<div class='trackInfo'>")
-
-    this.trackInfoDiv.append($("<h1 class='songTitle'><a href='null'>Loading</a></h1>"))
-    this.trackInfoDiv.append($("<h1 class='artist'><a href='null'>Loading</a></h1>"))
-    this.trackInfoDiv.append($("<h1 class='albumTitle'><a href='null'>Loading</a></h1>"))
-
-    this.div.append(this.trackInfoDiv)
-
-    // console.log(track)
-    $("body").append(div)
-
-    draw(track,index,[1.00,1.00,.50,.50,.25,.25,.0,.0])
-
 }
