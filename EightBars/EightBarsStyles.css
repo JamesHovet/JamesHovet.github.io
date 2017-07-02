@@ -1,0 +1,53 @@
+body {
+    background-color: #242424;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #1DB954;
+}
+
+.svgDiv {
+    display: block;
+    width: 300px;
+    height: 450px;
+    background-color: #FDFDFD;
+    /*box-shadow: 0 15px 33px 0 rgba(0,0,0,0.9);*/
+
+}
+
+.trackInfo {
+    display: block;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.trackInfo h1,h2,h3 {
+    text-align: center;
+    font-family: "Montserrat";
+    display: block;
+    overflow: hidden;
+}
+
+.songTitle {
+    font-size: 1.3em;
+    line-height: 1.1em;
+    max-height: 2.2em;
+
+}
+
+.artist, .albumTitle{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #222222
+}
+
+.artist {font-size: 1.1em;}
+.albumTitle {font-size: 0.9em;}
