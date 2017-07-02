@@ -96,15 +96,20 @@
     // testGetPlaylist()
 
 
-    var query
+    var query = getQueryVariable("q")
+    var user = getQueryVariable("user")
 
-    if(window.location.search != ""){
-        query = window.location.search.substring(3)
-    } else {
-        query = "0yfJRKOO08gmf4RfgDKzoM"
+    if(query == null){
+        query = "37i9dQZEVXbLRQDuF5jeBp"
     }
 
-    getPlaylist("jrhovet",query)
+    if(user == null){
+        user = "spotifycharts"
+    }
+
+// spotify:user:spotifycharts:playlist:37i9dQZEVXbLRQDuF5jeBp
+
+    getPlaylist(user,query)
 
     function getTrackSpec(rawTrack) {
         track = rawTrack
