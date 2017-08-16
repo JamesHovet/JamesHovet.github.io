@@ -11,9 +11,9 @@
 
     <header>
 
-
         <h1>Chipotle By The Numbers</h1>
-        <h3>What do people actually put in their Chipotle?</h3>
+        <h2>What do people actually put in their Chipotle?</h2>
+        <h3>Hover to see the which ingredient is which.</h3>
 
     </header>
 
@@ -171,11 +171,18 @@
         margin-right: auto;
     }
 
-    header h3 {
+    header h2 {
         margin-top: 10px;
         margin-bottom: 10px;
 
         font-size: 2em;
+        font-weight: 500;
+    }
+    header h3 {
+        margin-top: 10px;
+        margin-bottom: 10px;
+
+        font-size: 1.5em;
         font-weight: 500;
     }
 
@@ -376,8 +383,6 @@
         // type = "Burrito"
         // types.map(function(type) {
         types.map(function(type) {
-
-            console.log(type)
 
             var currentSVG = d3.select("#" + type).select("svg")
 
