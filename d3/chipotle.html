@@ -1,0 +1,434 @@
+<!DOCTYPE HTML>
+<head>
+    <script src="../scripts/d3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./chipotleD3Colors.css">
+    <link rel="stylesheet" type="=text/css" href="./chipotle.css">
+    <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,600" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>What do people actually put in their Chipotle?</h1>
+
+    </header>
+
+    <div class="svgDiv">
+        <div id="Burrito">
+            <table>
+                <tr>
+                    <td class="svg-td">
+                        <svg width="400px" height="400px"></svg>
+                    </td>
+                    <td class="info-td">
+                        <div class="info">
+                            <h2 class="title">Burrito</h2>
+                            <h3>Avg. Calories: ~1000</h3>
+                            <div class="hoverLayer"></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="svgDiv">
+        <div id="Bowl">
+            <table>
+                <tr>
+                    <td class="svg-td">
+                        <svg width="400px" height="400px"></svg>
+                    </td>
+                    <td class="info-td">
+                        <div class="info">
+                            <h2 class="title">Bowl</h2>
+                            <h3>Avg. Calories: ~TBD</h3>
+                            <div class="hoverLayer"></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="svgDiv">
+        <div id="Tacos">
+            <table>
+                <tr>
+                    <td class="svg-td">
+                        <svg width="400px" height="400px"></svg>
+                    </td>
+                    <td class="info-td">
+                        <div class="info">
+                            <h2 class="title">Tacos</h2>
+                            <h3>Avg. Calories: ~TBD</h3>
+                            <div class="hoverLayer"></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="svgDiv">
+        <div id="Salad">
+            <table>
+                <tr>
+                    <td class="svg-td">
+                        <svg width="400px" height="400px"></svg>
+                    </td>
+                    <td class="info-td">
+                        <div class="info">
+                            <h2 class="title">Salad</h2>
+                            <h3>Avg. Calories: ~TBD</h3>
+                            <div class="hoverLayer"></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>All data from the NYTimes Upshot: <a href="https://github.com/TheUpshot/chipotle">https://github.com/TheUpshot/chipotle</a></p>
+        <p>Made with <a href="https://d3js.org/">d3.js</a></p>
+        <p><a href="https://github.com/JamesHovet"><svg height="32" version="1.1" viewBox="0 0 16 16" width="32"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a></p>
+
+
+        <a href="http://www.github.com/JamesHovet" class="github-corner">
+            <svg width="80" height="80" viewBox="0 0 250 250"
+                 style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
+                <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+                <path
+                    d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+                    fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+                <path
+                    d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+                    fill="currentColor" class="octo-body"></path>
+            </svg>
+        </a>
+        <style>
+            .github-corner:hover .octo-arm {
+                animation: octocat-wave 560ms ease-in-out
+            }
+            @keyframes octocat-wave {
+                0%, 100% {
+                    transform: rotate(0)
+                }
+                20%, 60% {
+                    transform: rotate(-25deg)
+                }
+                40%, 80% {
+                    transform: rotate(10deg)
+                }
+            }
+            @media (max-width: 500px) {
+                .github-corner:hover .octo-arm {
+                    animation: none
+                }
+                .github-corner .octo-arm {
+                    animation: octocat-wave 560ms ease-in-out
+                }
+            }
+        </style>
+    </footer>
+
+</body>
+
+<style>
+    html {
+        background-image: url("../images/wooden-pattern.jpg");
+        background-repeat: repeat;
+
+        font-family: 'Oswald', sans-serif;
+    }
+
+    body {
+        margin: 0px;
+    }
+
+    header, footer{
+        color: #EAE7DF;
+        background-color: #54392D;
+
+        padding: 10px;
+    }
+
+    header h1 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+
+        text-align: center;
+
+        font-size: 5em;
+        font-weight: 500;
+
+        max-width: 850px;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    td {
+        width: 400px;
+        height: 400px;
+
+        vertical-align: top;
+    }
+
+    .info {
+        text-align: center;
+        display: block;
+        color: #EAE7DF;
+    }
+
+    .info .title {
+        font-size: 4em;
+        font-weight: 600;
+
+        margin-top: 5px;
+        margin-bottom: 5px;
+
+    }
+
+    .info h3 {
+        font-weight: 400;
+        font-size: 2.5em;
+
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .hoverLayer h2{
+        margin-top: 20px;
+        font-size: 3.9em;
+        margin-bottom: 0px;
+    }
+
+    .svgDiv {
+        background-color: #54392D;
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 804px;
+        padding: 10px;
+    }
+
+    .svgDiv svg {
+        display: inline;
+    }
+
+    .hoverLayer {
+        display: inline;
+        background-color: white;
+    }
+
+    footer {
+        margin-top: 100px;
+        text-align: center;
+        font-size: 1.2em;
+    }
+
+    footer a {
+        color: white;
+    }
+
+    footer p {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    footer svg {
+        margin-top: 2px;
+        fill: white;
+    }
+
+
+</style>
+
+<script>
+
+    //helper functions
+
+    function range(start, count) {
+        return Array.apply(0, Array(count))
+            .map(function (element, index) {
+                return index + start;
+            }
+        );
+    }
+
+    // var w = 400;
+    // var h = 800;
+
+
+
+    d3.json("./chipotleJson.json", function(data) {
+        // console.log(data)
+
+        //Type > ingredient : Frequency
+
+        var ingredientData = {
+            Bowl: {},
+            Burrito: {},
+            Salad: {},
+            Tacos: {},
+            All: {}
+        }
+
+        var ingredientTotals = {
+            Bowl: {"total" : 0},
+            Burrito: {"total" : 0},
+            Salad: {"total" : 0},
+            Tacos: {"total" : 0}
+        }
+
+        var ingredients = new Set([])
+
+        function updateIngedients(datum){
+            if (datum.type != "Drink" && datum.type != "Chips"){
+                root = ingredientData[datum.type]
+                all = ingredientData["All"]
+
+                datum.contents.map(function(ingredient) {
+                    if (root[ingredient] == null) {
+                        root[ingredient] = 0
+                    }
+                    if (all[ingredient] == null){
+                        all[ingredient] = 0
+                        ingredients.add(ingredient)
+                    }
+
+                    root[ingredient] += 1
+                    all[ingredient] += 1
+                    ingredientTotals[datum.type]["total"] += 1
+
+                });
+            }
+        }
+
+        data.map(updateIngedients)
+
+        console.log(ingredientData)
+        console.log(ingredients)
+        console.log(ingredientTotals)
+
+        //TODO calculate the percentages of each of the ingredients for each of the types and then create a visualization of each
+        // I think I'm going to do a filled-in graph paper kind of approach instead of a pie chart kind of thing.
+
+        //sort based on frequency of ingredients from every type
+
+        var sortedIngredients = Object.keys(ingredientData.All).map(function(key) {
+            var quantity = ingredientData.All[key]
+            return [key, quantity]
+        });
+
+        sortedIngredients.sort(function(first, second) {
+            return second[1] - first[1]
+        });
+
+        var drawingData = {}
+
+        var types = ["Burrito","Bowl","Salad","Tacos"]
+
+        types.map(function(type) {
+            drawingData[type] = []
+            root = drawingData[type]
+
+            oneUnit = +ingredientTotals[type]["total"]/100
+            ingredientTotals[type]["oneUnit"] = oneUnit
+
+            start = 0
+
+            sortedIngredients.map(function(row, index) {
+                root.push({
+                    "start" : start,
+                    "ingredient" : row[0],
+                })
+
+                start += +ingredientData[type][row[0]]/oneUnit
+            });
+        });
+
+        console.log(drawingData)
+        console.log(ingredientTotals)
+
+
+
+        //draw burrito
+        // type = "Burrito"
+        // types.map(function(type) {
+        types.map(function(type) {
+
+            console.log(type)
+
+            var currentSVG = d3.select("#" + type).select("svg")
+
+            var w = currentSVG.style("width").replace("px","")
+            console.log(w)
+            var h = w
+
+            //same as for index in range(100):
+            data = Array.from(Array(100).keys()).map(function(index) {
+                y = Math.floor(index/10)
+                x = index % 10
+
+                content = "TBD"
+
+                return {"x" : x, "y" : y, "content" : content}
+            });
+
+            current = 0
+            drawingData[type].map(function(ingredient) {
+                numberToAdd = Math.floor(ingredient.start) - current
+                if (numberToAdd > 0) {
+                    range(current, numberToAdd).map(function(index) {
+                        if (index < 100) {
+                            data[index]["class"] = ingredient.ingredient.replace(/ /g,'-')
+                            data[index]["name"] = ingredient.ingredient
+
+                        }
+                    })
+                }
+                current += numberToAdd
+            })
+            //handle last item
+            data[99]["class"] = data[98]["class"]
+            data[99]["name"] = data[98]["name"]
+
+            // var svg = d3.select("svg")
+
+
+
+            g = currentSVG.append("g").attr("id",type)
+
+            var hoverLayer = d3.select("#" + type + " .hoverLayer")
+
+            console.log(hoverLayer)
+            hoverLayer.attr("ME", "ME")
+
+            var scale = w/10
+            var padding = 1
+
+            g.selectAll("rect")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("x", function(d) { return (d["x"] * scale) + padding; })
+                .attr("y", function(d) { return (d["y"] * scale) + padding; })
+                .attr("width", scale - padding*2)
+                .attr("height", scale - padding*2)
+                .attr("class", function(d) {return d["class"]; })
+                .attr("name", function(d) {return d["name"]; })
+                .on("mouseover", function(d) {
+                    hoverLayer.append("h2")
+                    .html(d["name"])
+                })
+                .on("mouseout", function(d) {
+                    hoverLayer.selectAll("h2").remove()
+                })
+        })
+    })
+
+</script>
