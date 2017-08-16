@@ -1,0 +1,166 @@
+{
+	"Violet": {
+		"Ant": 3,
+		"Honeybee": 1,
+		"Fly": 1,
+		"sweat bee": 1,
+		"Bumblebee": 2
+	},
+	"Winter Cress": {
+		"Ant": 2
+	},
+	"wild geranium": {
+		"Fly": 1,
+		"Butterfly": 3,
+		"Honeybee": 2,
+		"sweat bee": 4
+	},
+	"daffodil": {
+		"Fly": 1
+	},
+	"Honeysuckle": {
+		"Ant": 1
+	},
+	"Leucothoe": {
+		"Bald Faced Hornet": 1,
+		"Honeybee": 1,
+		"Fly": 2
+	},
+	"Hawkweed": {
+		"hoverfly": 1,
+		"Honeybee": 1
+	},
+	"ranunculus": {
+		"hoverfly": 1,
+		"Honeybee": 1
+	},
+	"White Violet": {
+		"Ant": 5,
+		"Bee Mimick": 1
+	},
+	"Pin Cherry": {
+		"wasp": 1,
+		"beetle": 1
+	},
+	"Dandelion": {
+		"Ant": 29,
+		"wasp": 1,
+		"Honeybee": 1,
+		"Fly": 7
+	},
+	"Honeysuckle": {
+		"Fly": 1,
+		"Leucospidid Wasp": 1,
+		"Honeybee": 3,
+		"true bug": 1,
+		"wasp": 1,
+		"Bumblebee": 1,
+		"Ant": 6,
+		"sweat bee": 1,
+		"european honeybee": 1,
+		"Spider": 1
+	},
+	"Marsh Marigold": {
+		"Leaf footed bug": 1,
+		"Ant": 2,
+		"Unknown silver bug": 1,
+		"Spider": 1,
+		"Fly": 5
+	},
+	"pincherry": {
+		"Ant": 1,
+		"wasp": 2,
+		"beetle": 1,
+		"true bug": 2
+	},
+	"Strawberry": {
+		"beetle": 1,
+		"Longhorn Bee": 1
+	},
+	"rhododendron": {
+		"Fly": 2,
+		"Honeybee": 1,
+		"eastern carpenter bee": 2,
+		"Bumblebee": 2
+	},
+	"Veronica": {
+		"Ant": 1,
+		"wasp": 1
+	},
+	"white tulip": {
+		"eastern carpenter bee": 1
+	},
+	"Garlic Mustard": {
+		"Ant": 5,
+		"Black Vine Weevil": 1,
+		"Longhorn Bee": 1,
+		"Fly": 2
+	},
+	"white rhododendron": {
+		"Bumblebee": 3
+	},
+	"Aster": {
+		"Eastern Carpender Bee": 2,
+		"wasp": 1,
+		"Honeybee": 5,
+		"Grasshopper": 1,
+		"Fly": 1,
+		"Butterfly": 1,
+		"Eurpoean Carpender Bee": 1,
+		"european honeybee": 1
+	},
+	"dame's rocket": {
+		"wasp": 2,
+		"Honeybee": 1,
+		"monarch butterfly": 1,
+		"Ant": 2,
+		"Butterfly": 1,
+		"beetle": 3,
+		"european honeybee": 1
+	},
+	"lilac": {
+		"wasp": 1
+	},
+	"white clover": {
+		"Fly": 2,
+		"eastern carpenter bee": 1,
+		"european honeybee": 4
+	},
+	"Buttercup": {
+		"Bee": 1,
+		"Fly": 1,
+		"Unknown Beetle": 1,
+		"Yellow Jacket": 1
+	},
+	"raspberry": {
+		"european honeybee": 1
+	},
+	"Blueberry": {
+		"Ant": 1,
+		"Spider": 1
+	},
+	"Azaelea": {
+		"Ant": 2,
+		"Fly": 1,
+		"Bumblebee": 2
+	},
+	"St. John's Wort": {
+		"Ant": 2,
+		"Honeybee": 2,
+		"Fly": 3
+	},
+	"white wildflower": {
+		"Yellow Jacket": 1,
+		"Fly": 1,
+		"hoverfly": 2,
+		"Honeybee": 1,
+		"skipper": 1
+	},
+	"Crab Apple": {
+		"Honeybee": 1
+	},
+	"Mountain Laurel": {
+		"Ant": 4,
+		"Fly": 1
+	}
+}
