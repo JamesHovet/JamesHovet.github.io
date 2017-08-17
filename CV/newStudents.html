@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  background: #fcfcfa;
+}
+
+.stroke {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3px;
+}
+
+.fill {
+  fill: #fff;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+
+.land {
+  fill: #222;
+}
+
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+/* CV */
+
+body {
+    font-family: "Georgia"
+}
+
+p, h1, h2, h3, h4, text {
+    color: #222;
+}
+
+header img {
+    height: 60px;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-top: 0px;
+}
+
+.title {
+    font-style: italic;
+    text-align: center;
+    font-size: 3em;
+
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.byline {
+    text-align: center;
+    font-size: 1.4em;
+    margin-top: 10px;
+}
+
+body svg {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+/* d3 */
+
+.point {
+    fill: #891516;
+    stroke: #E04137;
+}
+
+</style>
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+<script src="https://d3js.org/d3-force.v1.min.js"></script>
+
+    <header>
+        <a href="https://thecirclevoice.org/"><img src="../images/CV_Header.png" height="80px" width="auto"></img></a>
+
+        <h1 class="title">By The Numbers: The New Students</h1>
+        <p class="byline">By James Hovet</p>
+    </header>
+
+
+
+
+<script>
+
+var width = window.innerWidth
+|| document.documentElement.clientWidth
+|| document.body.clientWidth
+
+width = width < 1000 ? width : 1000
+
+var height = width * (600/960)
+
+var projectionGlobal = d3.geoWinkel3()
+    // .scale(182)
+    .scale(width * (182/960))
+    .translate([width / 2, height / 2])
+    .precision(.1)
+
+
+var path = d3.geoPath(projectionGlobal)
+
+var graticule = d3.geoGraticule();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("defs").append("path")
+    .datum({type: "Sphere"})
+    .attr("id", "sphere")
+    .attr("d", path);
+
+svg.append("use")
+    .attr("class", "stroke")
+    .attr("xlink:href", "#sphere");
+
+svg.append("use")
+    .attr("class", "fill")
+    .attr("xlink:href", "#sphere");
+
+svg.append("path")
+    .datum(graticule)
+    .attr("class", "graticule")
+    .attr("d", path);
+
+d3.json("./world-50m.json", function(error, world) {
+    if (error) throw error;
+
+    console.log(topojson.feature(world, world.objects.land))
+
+
+    svg.insert("path", ".graticule")
+        .datum(topojson.feature(world, world.objects.land))
+        // .datum(world.objects.land)
+        .attr("class", "land")
+        .attr("d", path);
+
+    svg.insert("path", ".graticule")
+        .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+        .attr("class", "boundary")
+        .attr("d", path);
+
+
+    d3.json("./testGeoJson.geojson", function (error, data) {
+
+        var nodes = data.features.map((d) => {
+            coords = projectionGlobal(d["geometry"]["coordinates"])
+            node = {
+                x  : coords[0],
+                y  : coords[1],
+                fx : coords[0],
+                fy : coords[1],
+                start : coords,
+                radius : 5,
+                domestic: d["properties"]["isUSA"] ? true : false
+            }
+            console.log(node)
+
+            // node.fixed = true
+
+            return node
+        })
+
+        var simulation = d3.forceSimulation()
+            .force("charge", d3.forceManyBody().strength(-50))
+            .force("center", d3.forceCenter().x(width * .5).y(height * .5));
+
+        simulation.nodes(nodes)
+
+        console.log(simulation.nodes())
+
+        simulation.on("tick", function(e) {
+            svg.selectAll("circle")
+            .attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; });
+            simulation.tick()
+        });
+
+        svg.on("click", function (e) {
+            console.log(nodes)
+            nodes = nodes.map((node) => {
+                node.fx = null
+                node.fy = null
+
+                return node
+            })
+        })
+
+        svg.selectAll("circle")
+            .data(nodes)
+            .enter()
+            .append("circle")
+            .attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.x; })
+            .attr("r", function(d) { return d.radius; })
+            .attr("class", "point")
+            .classed("domestic", (d) => {
+                    return d.domestic ? true : false
+                })
+
+    })
+
+});
+
+d3.select(self.frameElement).style("height", height + "px");
+
+</script>

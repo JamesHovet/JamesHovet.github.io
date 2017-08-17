@@ -1,1 +1,1 @@
-{"features": [{"geometry": {"coordinates": [40.7938918, -73.9745939], "type": "Point"}, "properties": {"prop0": "value0"}, "type": "Feature"}], "type": "FeatureCollection"}
+{"features": [{"geometry": {"coordinates": [-73.9745939, 40.7938918], "type": "Point"}, "properties": {"isUSA": true}, "type": "Feature"}, {"geometry": {"coordinates": [-77.0365739, 38.8976633], "type": "Point"}, "properties": {"isUSA": true}, "type": "Feature"}], "type": "FeatureCollection"}

@@ -3,36 +3,45 @@ import json
 
 API_KEY = "AIzaSyAEzJWmWAvKCwhkaBXAzCnDFPBXmo2Jc1g"
 
-addr = "697 West End Ave, New York City, NY, 10025, United States"
-
-addr = addr.replace(" ", "+")
-
-URL = "https://maps.googleapis.com/maps/api/geocode/json?address=" + addr + "&key=" + API_KEY
-
-
-r = requests.get(URL)
-
-resultJson = r.json()
-
-lat = resultJson["results"][0]["geometry"]["location"]["lat"]
-lng = resultJson["results"][0]["geometry"]["location"]["lng"]
+addrList = ["697 West End Ave, New York City, NY, 10025, United States", "1600 Pennsylvania Ave, Washington DC, United States"]
 
 output = {
     "type" : "FeatureCollection",
     "features" : []
     }
 
-tmp = {"type" : "Feature",
-        "geometry" : {
-            "type" : "Point",
-            "coordinates" : [lat,lng]
-        },
-        "properties" : {
-            "prop0" : "value0"
-        }
-    }
 
-output["features"].append(tmp)
+# addr = "697 West End Ave, New York City, NY, 10025, United States"
+
+for addr in addrList:
+
+    addr = addr.replace(" ", "+")
+
+    URL = "https://maps.googleapis.com/maps/api/geocode/json?address=" + addr + "&key=" + API_KEY
+
+
+    r = requests.get(URL)
+
+    resultJson = r.json()
+
+    lat = resultJson["results"][0]["geometry"]["location"]["lat"]
+    lng = resultJson["results"][0]["geometry"]["location"]["lng"]
+
+    isUSA = "USA" in resultJson["results"][0]["formatted_address"]
+
+
+    tmp = {"type" : "Feature",
+            "geometry" : {
+                "type" : "Point",
+                "coordinates" : [lng,lat]
+            },
+            "properties" : {
+                "isUSA" : isUSA
+            }
+        }
+
+    output["features"].append(tmp)
+
 
 outputFile = open("./testGeoJson.geojson", mode='w')
 outputFile.write(json.dumps(output))
