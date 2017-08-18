@@ -1,9 +1,12 @@
 import requests
 import json
+import random
 
-API_KEY = "AIzaSyAEzJWmWAvKCwhkaBXAzCnDFPBXmo2Jc1g"
+key = open("./GoogleMapsKey.API_KEY", mode='r')
+API_KEY = str(key.readline()).replace("\n", "")
+key.close()
 
-addrList = ["697 West End Ave, New York City, NY, 10025, United States", "1600 Pennsylvania Ave, Washington DC, United States", "86 Douglas Road Needham, MA 02492","1600+Amphitheatre+Parkway,+Mountain+View,+CA", "98 West End Ave New York City NY 10025 United States"]
+addrList = ["697 West End Ave, New York City, NY, 10025, United States", "1600 Pennsylvania Ave, Washington DC, United States", "86 Douglas Road Needham, MA 02492","1600+Amphitheatre+Parkway,+Mountain+View,+CA", "98 West End Ave New York City NY 10025 United States", "1 Austin Road West; West Kowloon; Tsim Sha Tsui, Hong Kong"]
 
 output = {
     "type" : "FeatureCollection",
@@ -39,6 +42,10 @@ for addr in addrList:
                 state = component["short_name"]
                 break
 
+        gender = "M" if random.getrandbits(1) else "F"
+        schoolType = "Private" if random.getrandbits(1) else "Public"
+        form = random.randint(2, 5)
+
 
     tmp = {"type" : "Feature",
             "geometry" : {
@@ -47,7 +54,10 @@ for addr in addrList:
             },
             "properties" : {
                 "isUSA" : isUSA,
-                "state" : state
+                "state" : state,
+                "gender" : gender,
+                "form" : form,
+                "schoolType" : schoolType
             }
         }
 

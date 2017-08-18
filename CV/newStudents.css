@@ -1,0 +1,137 @@
+
+body {
+  background: #fcfcfa;
+}
+
+body, svg {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.stroke {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3px;
+}
+
+.fill {
+  fill: #fff;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+
+.land {
+  fill: #222;
+}
+
+.state {
+    fill: #222;
+    stroke: #fff;
+    stroke-width: .5px;
+}
+
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+/* CV */
+
+body {
+    font-family: "Georgia"
+}
+
+p, h1, h2, h3, h4, text, div  {
+    color: #222;
+}
+
+a {
+    color: #891516;
+    text-decoration: none;
+}
+
+header img {
+    height: 60px;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-top: 0px;
+}
+
+.title {
+    font-style: italic;
+    text-align: center;
+    font-size: 3em;
+
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.byline {
+    text-align: center;
+    font-size: 1.4em;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.byline a {
+    text-decoration: none;
+    color: #222;
+}
+
+.byline a:hover {
+    color: #891516;
+}
+
+.dateline {
+    text-align: center;
+    font-size: 0.9em;
+    font-style: italic;
+    margin-top: 0px;
+    color: #555555;
+}
+
+.aside {
+    font-size: 1.3em;
+}
+
+#label1 table {
+    width: 100%
+}
+
+#label1 td {
+    text-align: center;
+}
+
+body svg {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+/* d3 */
+
+.point {
+    fill: #891516;
+    stroke: #E04137;
+}
+
+.axis .domain {
+    stroke: #fcfcfa;
+}
+
+.axis text {
+    font-size: 1.5em;
+    font-family: "Helvetica", sans-serif;
+    font-weight: bold;
+}
+
+.axis .tick {
+    stroke-width: 3px;
+}

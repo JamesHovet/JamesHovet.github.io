@@ -1,496 +1,68 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-
-body {
-  background: #fcfcfa;
-}
-
-body, svg {
-    margin-left: 0px;
-    margin-right: 0px;
-}
-
-.stroke {
-  fill: none;
-  stroke: #000;
-  stroke-width: 3px;
-}
-
-.fill {
-  fill: #fff;
-}
-
-.graticule {
-  fill: none;
-  stroke: #777;
-  stroke-width: .5px;
-  stroke-opacity: .5;
-}
-
-.land {
-  fill: #222;
-}
-
-.boundary {
-  fill: none;
-  stroke: #fff;
-  stroke-width: .5px;
-}
-/* CV */
-
-body {
-    font-family: "Georgia"
-}
-
-p, h1, h2, h3, h4, text, div {
-    color: #222;
-}
-
-header img {
-    height: 60px;
-    width: auto;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    margin-top: 0px;
-}
-
-.title {
-    font-style: italic;
-    text-align: center;
-    font-size: 3em;
-
-    margin-top: 0px;
-    margin-bottom: 5px;
-}
-
-.byline {
-    text-align: center;
-    font-size: 1.4em;
-    margin-top: 10px;
-}
-
-.aside {
-    font-size: 1.3em;
-}
-
-#label1 table {
-    width: 100%
-}
-
-#label1 td {
-    text-align: center;
-}
-
-body svg {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
-
-/* d3 */
-
-.point {
-    fill: #891516;
-    stroke: #E04137;
-}
-
-.axis .domain {
-    stroke: #fcfcfa;
-}
-
-.axis text {
-    font-size: 1.5em;
-    font-family: "Helvetica", sans-serif;
-    font-weight: bold;
-}
-
-.axis .tick {
-    stroke-width: 3px;
-}
-
-</style>
+<head>
+    <link href="./newStudents.css" rel="stylesheet" type="text/css">
+</head>
 <body>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://d3js.org/d3-geo.v1.min.js"></script>
-<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-<script src="https://d3js.org/topojson.v1.min.js"></script>
-<script src="https://d3js.org/d3-force.v1.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://d3js.org/d3-force.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v1.min.js"></script>
 
     <header>
         <a href="https://thecirclevoice.org/"><img src="../images/CV_Header.png" height="80px" width="auto"></img></a>
 
         <h1 class="title">By The Numbers: The New Students</h1>
-        <p class="byline">By James Hovet</p>
+        <p class="byline"><a href="jameshovet.github.io">By James Hovet</a></p>
+        <p class="dateline">Septemeber 12, 2017</p>
     </header>
 
     <svg>
-
-        <!--First Text Aside-->
-
         <foreignObject id="aside1" x="46" y="22" width="200" height="300">
             <body xmlns="http://www.w3.org/1999/xhtml">
                 <div class="aside">Groton is welcoming 104 new students this fall, 11 of whom identify as international. <span style="color:  #891516; font-size: 0.8em;">&#9660;</span></div>
             </body>
         </foreignObject>
+
         <foreignObject id="aside2" x="46" y="22" width="200" height="300">
             <body xmlns="http://www.w3.org/1999/xhtml">
-                <div class="aside">The remaining 93 students represent 24 different states.</div>
+                <div class="aside">The remaining 93 students represent 21 different states.
+                    <!-- <span style="color:  #891516; font-size: 0.8em;">&#9660;</span> -->
+                </div>
+            </body>
+        </foreignObject>
+
+        <foreignObject id="aside3" x="46" y="22" width="200" height="300">
+            <body xmlns="http://www.w3.org/1999/xhtml">
+                <div class="aside">The most frequent of which are TK
+                    <!-- <span style="color:  #891516; font-size: 0.8em;">&#9660;</span> -->
+                </div>
+            </body>
+        </foreignObject>
+
+        <foreignObject id="aside4" x="46" y="22" width="200" height="300">
+            <body xmlns="http://www.w3.org/1999/xhtml">
+                <div class="aside">Something about gender TK
+                    <!-- <span style="color:  #891516; font-size: 0.8em;">&#9660;</span> -->
+                </div>
+            </body>
+        </foreignObject>
+
+        <foreignObject id="aside5" x="46" y="22" width="200" height="300">
+            <body xmlns="http://www.w3.org/1999/xhtml">
+                <div class="aside">Something about Private vs. public TK
+                    <!-- <span style="color:  #891516; font-size: 0.8em;">&#9660;</span> -->
+                </div>
             </body>
         </foreignObject>
 
     </svg>
 
-
-<script>
-
-var width = window.innerWidth
-|| document.documentElement.clientWidth
-|| document.body.clientWidth
-
-width = width < 1000 ? width : 1000
-
-var height = 2500
-
-var heightGlobe = width * (600/960)
-
-//draw globe
-var projectionGlobal = d3.geoWinkel3()
-    .scale(width * (182/960))
-    .translate([width / 2, heightGlobe / 2])
-    .precision(.1)
-
-var projectionGlobal = d3.geoKavrayskiy7()
-    .scale(width * (170/960))
-    .translate([width / 2, heightGlobe / 2])
-    .precision(.1)
-
-var pathGlobal = d3.geoPath(projectionGlobal)
-
-var graticule = d3.geoGraticule();
-
-var svg = d3.select("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-svg.append("defs").append("path")
-    .datum({type: "Sphere"})
-    .attr("id", "sphere")
-    .attr("d", pathGlobal);
-
-svg.append("use")
-    .attr("class", "stroke")
-    .attr("xlink:href", "#sphere");
-
-svg.append("use")
-    .attr("class", "fill")
-    .attr("xlink:href", "#sphere");
-
-svg.append("path")
-    .datum(graticule)
-    .attr("class", "graticule")
-    .attr("d", pathGlobal);
-
-d3.json("./world-50m.json", function(error, world) {
-    if (error) throw error;
-
-    console.log(topojson.feature(world, world.objects.land))
-
-    svg.insert("path", ".graticule")
-        .datum(topojson.feature(world, world.objects.land))
-        // .datum(world.objects.land)
-        .attr("class", "land")
-        .attr("d", pathGlobal);
-
-    svg.insert("path", ".graticule")
-        .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
-        .attr("class", "boundary")
-        .attr("d", pathGlobal);
-
-});
-
-//draw US
-var projectionDomestic = d3.geoAlbersUsa()
-    // .rotate([96, 0])
-    // .center([-.6, 38.7])
-    // .parallels([29.5, 45.5])
-    // .scale(1070)
-    // .translate([width / 2, 0])
-    // .precision(.1);
-
-
-var pathDomestic = d3.geoPath(projectionDomestic)
-
-var gDomestic = svg.append("g")
-    .attr("id", "domestic")
-    .attr("transform", "translate(0," + (Number(heightGlobe) + Number(400.0)) + ")")
-
-d3.json("./us.json", function(error, us) {
-    if (error) throw error;
-
-    console.log(us)
-    console.log(topojson.feature(us, us.objects.land))
-
-    gDomestic.insert("path")
-      .datum(topojson.feature(us, us.objects.land))
-      .attr("class", "land")
-      .attr("d", pathDomestic);
-
-    // gDomestic.append("g")
-    //     .attr("class", "land")
-    //     .selectAll("path")
-    //     .datum(topojson.feature(us, us.objects.land).features)
-    //     .enter().append("path")
-    //     .attr("d", pathDomestic);
-
-    gDomestic.append("path")
-        .attr("class", "boundary")
-        .attr("d", pathDomestic(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
-});
-
-//draw text
-    var padding = 50
-
-    aside1 = d3.select("#aside1")
-        .attr("x", width/8)
-        .attr("y", heightGlobe + padding)
-        .attr("width", width/2)
-
-    aside2 = d3.select("#aside2")
-        .attr("x", width/8)
-        .attr("y", heightGlobe + 400 + heightGlobe )
-        .attr("width", width/2)
-
-    label1 = d3.select("#label1")
-        .attr("x", width/8)
-        .attr("y", heightGlobe + 300)
-        .attr("width", width/1.5)
-
-//draw points
-
-var nodes
-
-var simulation = d3.forceSimulation()
-
-var geographicStates = {}
-
-var ordinalStateScale = d3.scaleOrdinal()
-
-var stateXAxis = d3.axisBottom()
-
-var ordinalInternationalScale = d3.scaleOrdinal()
-    .domain([true,false])
-    .range([getX(0,2),getX(1,2)])
-
-var internationalXAxis = d3.axisBottom()
-    .scale(ordinalInternationalScale)
-    .tickValues(["Domestic", "International"])
-
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(" + 0 + "," + Number(heightGlobe + 200 + 100) + ")")
-    .call(internationalXAxis);
-
-d3.json("./testGeoJson.geojson", function (error, data) {
-
-    nodes = data.features.map((d) => {
-
-        if(d["properties"]["isUSA"]) {
-            state = d["properties"]["state"]
-            if(geographicStates[state] == null){
-                geographicStates[state] = 0
-            }
-            geographicStates[state] += 1
-        }
-
-        coords = projectionGlobal(d["geometry"]["coordinates"])
-        latLng = d["geometry"]["coordinates"]
-        node = {
-            lat : latLng[0],
-            lng : latLng[1],
-            fx : coords[0],
-            fy : coords[1],
-            start : coords,
-            attractionTarget: [width/4, heightGlobe + 200],
-            radius : 5,
-            domestic: d["properties"]["isUSA"] ? true : false,
-            state : state
-        }
-        return node
-    })
-
-    var sortableStates = Object.keys(geographicStates).map(function(key) {
-        return [key, geographicStates[key]];
-    });
-
-    sortableStates.sort(function(first, second) {
-        return second[1] - first[1];
-    });
-
-    sortedStates = sortableStates.map((d) => {return d[0]; })
-
-    statesRange = [...Array(sortedStates.length).keys()].map((index) => {
-        return getX(index, sortedStates.length)
-    })
-
-    console.log(statesRange)
-
-    ordinalStateScale
-        .domain(sortedStates)
-        .range(statesRange)
-
-    stateXAxis
-        .scale(ordinalStateScale)
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(" + 0 + "," +  Number(heightGlobe + heightGlobe + 400 + 200 + 100) + ")")
-        .call(stateXAxis);
-
-    //simulation
-    simulation
-        .force("x", d3.forceX(function(d) {
-            return d.attractionTarget[0];
-        }).strength(0.05))
-        .force("y", d3.forceY(function(d) {
-            return d.attractionTarget[1];
-        }).strength(0.05))
-        .force("collide", d3.forceCollide((d) => {return d.radius; }))
-        .force("attraction", d3.forceManyBody().strength(3))
-
-        .alphaTarget(0.3)
-
-    simulation.nodes(nodes)
-
-    simulation.on("tick", function(e) {
-        svg.selectAll("circle")
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; })
-        .attr("r", function(d) { return d.radius; })
-    });
-
-    //draw to svg
-    svg.selectAll("circle")
-        .data(nodes)
-        .enter()
-        .append("circle")
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.x; })
-        .attr("r", function(d) { return d.radius; })
-        .attr("class", "point")
-        .classed("domestic", (d) => {
-                return d.domestic ? true : false
-            })
-    // console.log(nodes)
-
-});
-
-//animation
-
-function getX(index, items) {
-    workingWidth = width * (6/8)
-    offset = width * (1/8)
-
-    return offset + (((index * 2) + 1 ) * (workingWidth/(items * 2)))
-}
-
-function setToStart() {
-    nodes = simulation.nodes()
-
-    nodes = nodes.map((node) => {
-        node.attractionTarget = node.start
-        return node
-    })
-    simulation.alpha(1).restart()
-    simulation.nodes(nodes)
-    //take away collision and attraction
-    simulation.force("collide", null)
-    simulation.force("attraction", null)
-}
-
-function setToInternationalCluster() {
-    nodes = simulation.nodes()
-
-    nodes = nodes.map((node) => {
-
-        node.attractionTarget = [ordinalInternationalScale(node.domestic), heightGlobe + 200]
-
-        node.fx = null
-        node.fy = null
-
-        return node
-    })
-    simulation.alpha(1).restart()
-    simulation.nodes(nodes)
-    //add back the physics
-    .force("collide", d3.forceCollide((d) => {return d.radius; }))
-    .force("attraction", d3.forceManyBody().strength(3))
-}
-
-function setToUnitedStatesMap() {
-    nodes = simulation.nodes()
-
-    nodes = nodes.map((node) => {
-        node.attractionTarget = projectionDomestic([node.lat ,node.lng])
-        node.attractionTarget[1] += Number(heightGlobe) + Number(400)
-        return node
-    })
-    simulation.alpha(1).restart()
-    simulation.nodes(nodes)
-    //take away collision and attraction
-    .force("collide", d3.forceCollide((d) => {return d.radius/2; }))
-    simulation.force("attraction", null)
-}
-
-function setToOrdinalStateCluster() {
-    nodes = simulation.nodes()
-
-    nodes = nodes.map((node) => {
-
-        node.attractionTarget = [ordinalStateScale(node.state), heightGlobe + heightGlobe + 400 + 200]
-
-        return node
-    })
-    simulation.alpha(1).restart()
-    simulation.nodes(nodes)
-    //add back the physics
-    .force("collide", d3.forceCollide((d) => {return d.radius; }))
-    .force("attraction", d3.forceManyBody().strength(3))
-}
-
-states = [
-    {name : "startingState", f : setToStart, min : 0, max : heightGlobe/4},
-    {name : "internationalCluster", f : setToInternationalCluster, min: heightGlobe/4, max : heightGlobe + 300},
-    {name : "unitedStatesMap", f : setToUnitedStatesMap, min : heightGlobe + 300, max: heightGlobe + heightGlobe},
-    {name : "ordinalStateCluster", f : setToOrdinalStateCluster, min : heightGlobe + heightGlobe, max: 999999999}
-    //TBD
-]
-
-currentState = "startingState"
-
-function setStateFromScroll(scroll_pos) {
-    states.map((state) => {
-        if (scroll_pos > state.min && scroll_pos < state.max && state.name != currentState)
-
-        state.f()
-        currentState = state.name
-
-    })
-}
-
-var last_known_scroll_position = 0;
-var ticking = false;
-
-window.addEventListener('scroll', function(e) {
-  last_known_scroll_position = window.scrollY;
-  if (!ticking) {
-    window.requestAnimationFrame(function() {
-      setStateFromScroll(last_known_scroll_position);
-      ticking = false;
-    });
-  }
-  ticking = true;
-});
-
-</script>
+    <script src="./d3Helpers.js"></script>
+    <script src="./d3AnimationStates.js"></script>
+    <script src="./drawMaps.js"></script>
+    <script src="./newStudents.js"></script>
+</body>
