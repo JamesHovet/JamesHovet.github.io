@@ -96,6 +96,20 @@ body svg {
     stroke: #E04137;
 }
 
+.axis .domain {
+    stroke: #fcfcfa;
+}
+
+.axis text {
+    font-size: 1.5em;
+    font-family: "Helvetica", sans-serif;
+    font-weight: bold;
+}
+
+.axis .tick {
+    stroke-width: 3px;
+}
+
 </style>
 <body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -122,19 +136,7 @@ body svg {
         </foreignObject>
         <foreignObject id="aside2" x="46" y="22" width="200" height="300">
             <body xmlns="http://www.w3.org/1999/xhtml">
-                <div class="aside">The remaining 93 students represent 24 differnt states.</div>
-            </body>
-        </foreignObject>
-        <foreignObject id="label1" x="46" y="22" width="200" height="300">
-            <body xmlns="http://www.w3.org/1999/xhtml">
-                <div class="label">
-                    <table>
-                        <tr>
-                            <td>Domestic</td>
-                            <td>International</td>
-                        </tr>
-                    </table>
-                </div>
+                <div class="aside">The remaining 93 students represent 24 different states.</div>
             </body>
         </foreignObject>
 
@@ -275,6 +277,21 @@ var geographicStates = {}
 
 var ordinalStateScale = d3.scaleOrdinal()
 
+var stateXAxis = d3.axisBottom()
+
+var ordinalInternationalScale = d3.scaleOrdinal()
+    .domain([true,false])
+    .range([getX(0,2),getX(1,2)])
+
+var internationalXAxis = d3.axisBottom()
+    .scale(ordinalInternationalScale)
+    .tickValues(["Domestic", "International"])
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(" + 0 + "," + Number(heightGlobe + 200 + 100) + ")")
+    .call(internationalXAxis);
+
 d3.json("./testGeoJson.geojson", function (error, data) {
 
     nodes = data.features.map((d) => {
@@ -313,9 +330,23 @@ d3.json("./testGeoJson.geojson", function (error, data) {
 
     sortedStates = sortableStates.map((d) => {return d[0]; })
 
+    statesRange = [...Array(sortedStates.length).keys()].map((index) => {
+        return getX(index, sortedStates.length)
+    })
+
+    console.log(statesRange)
+
     ordinalStateScale
         .domain(sortedStates)
-        .range([...Array(sortedStates.length).keys()])
+        .range(statesRange)
+
+    stateXAxis
+        .scale(ordinalStateScale)
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(" + 0 + "," +  Number(heightGlobe + heightGlobe + 400 + 200 + 100) + ")")
+        .call(stateXAxis);
 
     //simulation
     simulation
@@ -325,7 +356,7 @@ d3.json("./testGeoJson.geojson", function (error, data) {
         .force("y", d3.forceY(function(d) {
             return d.attractionTarget[1];
         }).strength(0.05))
-        .force("collide", d3.forceCollide(5))
+        .force("collide", d3.forceCollide((d) => {return d.radius; }))
         .force("attraction", d3.forceManyBody().strength(3))
 
         .alphaTarget(0.3)
@@ -383,7 +414,7 @@ function setToInternationalCluster() {
 
     nodes = nodes.map((node) => {
 
-        node.attractionTarget = !node.domestic ? [getX(0, 2), heightGlobe + 200] : [getX(1, 2), heightGlobe + 200]
+        node.attractionTarget = [ordinalInternationalScale(node.domestic), heightGlobe + 200]
 
         node.fx = null
         node.fy = null
@@ -393,7 +424,7 @@ function setToInternationalCluster() {
     simulation.alpha(1).restart()
     simulation.nodes(nodes)
     //add back the physics
-    .force("collide", d3.forceCollide(5))
+    .force("collide", d3.forceCollide((d) => {return d.radius; }))
     .force("attraction", d3.forceManyBody().strength(3))
 }
 
@@ -408,7 +439,7 @@ function setToUnitedStatesMap() {
     simulation.alpha(1).restart()
     simulation.nodes(nodes)
     //take away collision and attraction
-    simulation.force("collide", null)
+    .force("collide", d3.forceCollide((d) => {return d.radius/2; }))
     simulation.force("attraction", null)
 }
 
@@ -417,14 +448,14 @@ function setToOrdinalStateCluster() {
 
     nodes = nodes.map((node) => {
 
-        node.attractionTarget = [getX(ordinalStateScale(node.state), sortedStates.length), heightGlobe + heightGlobe + 400 + 200]
+        node.attractionTarget = [ordinalStateScale(node.state), heightGlobe + heightGlobe + 400 + 200]
 
         return node
     })
     simulation.alpha(1).restart()
     simulation.nodes(nodes)
     //add back the physics
-    .force("collide", d3.forceCollide(5))
+    .force("collide", d3.forceCollide((d) => {return d.radius; }))
     .force("attraction", d3.forceManyBody().strength(3))
 }
 
