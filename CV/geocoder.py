@@ -3,7 +3,7 @@ import json
 
 API_KEY = "AIzaSyAEzJWmWAvKCwhkaBXAzCnDFPBXmo2Jc1g"
 
-addrList = ["697 West End Ave, New York City, NY, 10025, United States", "1600 Pennsylvania Ave, Washington DC, United States", "86 Douglas Road Needham, MA 02492"]
+addrList = ["697 West End Ave, New York City, NY, 10025, United States", "1600 Pennsylvania Ave, Washington DC, United States", "86 Douglas Road Needham, MA 02492","1600+Amphitheatre+Parkway,+Mountain+View,+CA", "98 West End Ave New York City NY 10025 United States"]
 
 output = {
     "type" : "FeatureCollection",
@@ -29,6 +29,16 @@ for addr in addrList:
 
     isUSA = "USA" in resultJson["results"][0]["formatted_address"]
 
+    if isUSA:
+        components = resultJson["results"][0]["address_components"]
+
+        state = None
+
+        for component in components:
+            if "administrative_area_level_1" in component["types"]:
+                state = component["short_name"]
+                break
+
 
     tmp = {"type" : "Feature",
             "geometry" : {
@@ -36,7 +46,8 @@ for addr in addrList:
                 "coordinates" : [lng,lat]
             },
             "properties" : {
-                "isUSA" : isUSA
+                "isUSA" : isUSA,
+                "state" : state
             }
         }
 

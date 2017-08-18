@@ -6,6 +6,11 @@ body {
   background: #fcfcfa;
 }
 
+body, svg {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
 .stroke {
   fill: none;
   stroke: #000;
@@ -70,6 +75,14 @@ header img {
     font-size: 1.3em;
 }
 
+#label1 table {
+    width: 100%
+}
+
+#label1 td {
+    text-align: center;
+}
+
 body svg {
     margin-left: auto;
     margin-right: auto;
@@ -112,6 +125,18 @@ body svg {
                 <div class="aside">The remaining 93 students represent 24 differnt states.</div>
             </body>
         </foreignObject>
+        <foreignObject id="label1" x="46" y="22" width="200" height="300">
+            <body xmlns="http://www.w3.org/1999/xhtml">
+                <div class="label">
+                    <table>
+                        <tr>
+                            <td>Domestic</td>
+                            <td>International</td>
+                        </tr>
+                    </table>
+                </div>
+            </body>
+        </foreignObject>
 
     </svg>
 
@@ -124,7 +149,7 @@ var width = window.innerWidth
 
 width = width < 1000 ? width : 1000
 
-var height = 2000
+var height = 2500
 
 var heightGlobe = width * (600/960)
 
@@ -235,33 +260,64 @@ d3.json("./us.json", function(error, us) {
         .attr("y", heightGlobe + 400 + heightGlobe )
         .attr("width", width/2)
 
+    label1 = d3.select("#label1")
+        .attr("x", width/8)
+        .attr("y", heightGlobe + 300)
+        .attr("width", width/1.5)
+
 //draw points
 
 var nodes
 
 var simulation = d3.forceSimulation()
 
+var geographicStates = {}
+
+var ordinalStateScale = d3.scaleOrdinal()
+
 d3.json("./testGeoJson.geojson", function (error, data) {
 
     nodes = data.features.map((d) => {
+
+        if(d["properties"]["isUSA"]) {
+            state = d["properties"]["state"]
+            if(geographicStates[state] == null){
+                geographicStates[state] = 0
+            }
+            geographicStates[state] += 1
+        }
+
         coords = projectionGlobal(d["geometry"]["coordinates"])
         latLng = d["geometry"]["coordinates"]
         node = {
             lat : latLng[0],
             lng : latLng[1],
-            x  : coords[0],
-            y  : coords[1],
             fx : coords[0],
             fy : coords[1],
             start : coords,
-            attractionTarget: [width/4, 800],
+            attractionTarget: [width/4, heightGlobe + 200],
             radius : 5,
-            domestic: d["properties"]["isUSA"] ? true : false
+            domestic: d["properties"]["isUSA"] ? true : false,
+            state : state
         }
         return node
     })
 
+    var sortableStates = Object.keys(geographicStates).map(function(key) {
+        return [key, geographicStates[key]];
+    });
 
+    sortableStates.sort(function(first, second) {
+        return second[1] - first[1];
+    });
+
+    sortedStates = sortableStates.map((d) => {return d[0]; })
+
+    ordinalStateScale
+        .domain(sortedStates)
+        .range([...Array(sortedStates.length).keys()])
+
+    //simulation
     simulation
         .force("x", d3.forceX(function(d) {
             return d.attractionTarget[0];
@@ -283,6 +339,7 @@ d3.json("./testGeoJson.geojson", function (error, data) {
         .attr("r", function(d) { return d.radius; })
     });
 
+    //draw to svg
     svg.selectAll("circle")
         .data(nodes)
         .enter()
@@ -294,8 +351,18 @@ d3.json("./testGeoJson.geojson", function (error, data) {
         .classed("domestic", (d) => {
                 return d.domestic ? true : false
             })
-    console.log(nodes)
+    // console.log(nodes)
+
 });
+
+//animation
+
+function getX(index, items) {
+    workingWidth = width * (6/8)
+    offset = width * (1/8)
+
+    return offset + (((index * 2) + 1 ) * (workingWidth/(items * 2)))
+}
 
 function setToStart() {
     nodes = simulation.nodes()
@@ -316,7 +383,7 @@ function setToInternationalCluster() {
 
     nodes = nodes.map((node) => {
 
-        node.attractionTarget = node.domestic ? [width * 3/4, 800] : [width * 1/4, 800]
+        node.attractionTarget = !node.domestic ? [getX(0, 2), heightGlobe + 200] : [getX(1, 2), heightGlobe + 200]
 
         node.fx = null
         node.fy = null
@@ -345,10 +412,27 @@ function setToUnitedStatesMap() {
     simulation.force("attraction", null)
 }
 
+function setToOrdinalStateCluster() {
+    nodes = simulation.nodes()
+
+    nodes = nodes.map((node) => {
+
+        node.attractionTarget = [getX(ordinalStateScale(node.state), sortedStates.length), heightGlobe + heightGlobe + 400 + 200]
+
+        return node
+    })
+    simulation.alpha(1).restart()
+    simulation.nodes(nodes)
+    //add back the physics
+    .force("collide", d3.forceCollide(5))
+    .force("attraction", d3.forceManyBody().strength(3))
+}
+
 states = [
-    {name : "startingState", f : setToStart, min : 0, max : heightGlobe/2},
-    {name : "internationalCluster", f : setToInternationalCluster, min: heightGlobe/2, max : heightGlobe + 200},
-    {name : "unitedStatesMap", f : setToUnitedStatesMap, min : heightGlobe + 200, max: 999999999}
+    {name : "startingState", f : setToStart, min : 0, max : heightGlobe/4},
+    {name : "internationalCluster", f : setToInternationalCluster, min: heightGlobe/4, max : heightGlobe + 300},
+    {name : "unitedStatesMap", f : setToUnitedStatesMap, min : heightGlobe + 300, max: heightGlobe + heightGlobe},
+    {name : "ordinalStateCluster", f : setToOrdinalStateCluster, min : heightGlobe + heightGlobe, max: 999999999}
     //TBD
 ]
 
