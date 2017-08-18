@@ -38,7 +38,7 @@ body {
     font-family: "Georgia"
 }
 
-p, h1, h2, h3, h4, text {
+p, h1, h2, h3, h4, text, div {
     color: #222;
 }
 
@@ -64,6 +64,10 @@ header img {
     text-align: center;
     font-size: 1.4em;
     margin-top: 10px;
+}
+
+.aside {
+    font-size: 1.3em;
 }
 
 body svg {
@@ -94,7 +98,17 @@ body svg {
         <p class="byline">By James Hovet</p>
     </header>
 
+    <svg>
 
+        <!--First Text Aside-->
+
+        <foreignObject id="aside1" x="46" y="22" width="200" height="300">
+            <body xmlns="http://www.w3.org/1999/xhtml">
+                <div class="aside">&#9;Groton is welcoming 104 new students this fall, 11 of whom identify as international.</div>
+            </body>
+        </foreignObject>
+
+    </svg>
 
 
 <script>
@@ -105,27 +119,31 @@ var width = window.innerWidth
 
 width = width < 1000 ? width : 1000
 
-var height = width * (600/960)
+var height = 2000
 
+var heightGlobe = width * (600/960)
+
+
+
+//draw globe
 var projectionGlobal = d3.geoWinkel3()
-    // .scale(182)
     .scale(width * (182/960))
-    .translate([width / 2, height / 2])
+    .translate([width / 2, heightGlobe / 2])
     .precision(.1)
 
 
-var path = d3.geoPath(projectionGlobal)
+var pathGlobal = d3.geoPath(projectionGlobal)
 
 var graticule = d3.geoGraticule();
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("svg")
     .attr("width", width)
     .attr("height", height);
 
 svg.append("defs").append("path")
     .datum({type: "Sphere"})
     .attr("id", "sphere")
-    .attr("d", path);
+    .attr("d", pathGlobal);
 
 svg.append("use")
     .attr("class", "stroke")
@@ -138,87 +156,211 @@ svg.append("use")
 svg.append("path")
     .datum(graticule)
     .attr("class", "graticule")
-    .attr("d", path);
+    .attr("d", pathGlobal);
 
 d3.json("./world-50m.json", function(error, world) {
     if (error) throw error;
 
     console.log(topojson.feature(world, world.objects.land))
 
-
     svg.insert("path", ".graticule")
         .datum(topojson.feature(world, world.objects.land))
         // .datum(world.objects.land)
         .attr("class", "land")
-        .attr("d", path);
+        .attr("d", pathGlobal);
 
     svg.insert("path", ".graticule")
         .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
         .attr("class", "boundary")
-        .attr("d", path);
-
-
-    d3.json("./testGeoJson.geojson", function (error, data) {
-
-        var nodes = data.features.map((d) => {
-            coords = projectionGlobal(d["geometry"]["coordinates"])
-            node = {
-                x  : coords[0],
-                y  : coords[1],
-                fx : coords[0],
-                fy : coords[1],
-                start : coords,
-                radius : 5,
-                domestic: d["properties"]["isUSA"] ? true : false
-            }
-            console.log(node)
-
-            // node.fixed = true
-
-            return node
-        })
-
-        var simulation = d3.forceSimulation()
-            .force("charge", d3.forceManyBody().strength(-50))
-            .force("center", d3.forceCenter().x(width * .5).y(height * .5));
-
-        simulation.nodes(nodes)
-
-        console.log(simulation.nodes())
-
-        simulation.on("tick", function(e) {
-            svg.selectAll("circle")
-            .attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; });
-            simulation.tick()
-        });
-
-        svg.on("click", function (e) {
-            console.log(nodes)
-            nodes = nodes.map((node) => {
-                node.fx = null
-                node.fy = null
-
-                return node
-            })
-        })
-
-        svg.selectAll("circle")
-            .data(nodes)
-            .enter()
-            .append("circle")
-            .attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.x; })
-            .attr("r", function(d) { return d.radius; })
-            .attr("class", "point")
-            .classed("domestic", (d) => {
-                    return d.domestic ? true : false
-                })
-
-    })
+        .attr("d", pathGlobal);
 
 });
 
-d3.select(self.frameElement).style("height", height + "px");
+//draw US
+var projectionDomestic = d3.geoAlbersUsa()
+    // .rotate([96, 0])
+    // .center([-.6, 38.7])
+    // .parallels([29.5, 45.5])
+    // .scale(1070)
+    // .translate([width / 2, 0])
+    // .precision(.1);
+
+
+var pathDomestic = d3.geoPath(projectionDomestic)
+
+var gDomestic = svg.append("g")
+    .attr("id", "domestic")
+    .attr("transform", "translate(0," + (Number(heightGlobe) + Number(400.0)) + ")")
+
+d3.json("./us.json", function(error, us) {
+    if (error) throw error;
+
+    console.log(us)
+    console.log(topojson.feature(us, us.objects.land))
+
+    gDomestic.insert("path")
+      .datum(topojson.feature(us, us.objects.land))
+      .attr("class", "land")
+      .attr("d", pathDomestic);
+
+    // gDomestic.append("g")
+    //     .attr("class", "land")
+    //     .selectAll("path")
+    //     .datum(topojson.feature(us, us.objects.land).features)
+    //     .enter().append("path")
+    //     .attr("d", pathDomestic);
+
+    gDomestic.append("path")
+        .attr("class", "boundary")
+        .attr("d", pathDomestic(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
+});
+
+//draw text
+    var padding = 50
+
+    aside1 = d3.select("#aside1")
+        .attr("x", width/8)
+        .attr("y", heightGlobe + padding)
+        .attr("width", width/2)
+
+//draw points
+
+var nodes
+
+var simulation = d3.forceSimulation()
+
+d3.json("./testGeoJson.geojson", function (error, data) {
+
+    nodes = data.features.map((d) => {
+        coords = projectionGlobal(d["geometry"]["coordinates"])
+        latLng = d["geometry"]["coordinates"]
+        node = {
+            lat : latLng[0],
+            lng : latLng[1],
+            x  : coords[0],
+            y  : coords[1],
+            fx : coords[0],
+            fy : coords[1],
+            start : coords,
+            attractionTarget: [width/4, 900],
+            radius : 5,
+            domestic: d["properties"]["isUSA"] ? true : false
+        }
+        return node
+    })
+
+
+    simulation
+        .force("x", d3.forceX(function(d) {
+            return d.attractionTarget[0];
+        }).strength(0.005))
+        .force("y", d3.forceY(function(d) {
+            return d.attractionTarget[1];
+        }).strength(0.05))
+        .force("collide", d3.forceCollide(5))
+        .force("attraction", d3.forceManyBody().strength(3))
+
+        // .alphaTarget(0.3)
+
+    simulation.nodes(nodes)
+
+    simulation.on("tick", function(e) {
+        svg.selectAll("circle")
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+        .attr("r", function(d) { return d.radius; })
+    });
+
+    svg.selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.x; })
+        .attr("r", function(d) { return d.radius; })
+        .attr("class", "point")
+        .classed("domestic", (d) => {
+                return d.domestic ? true : false
+            })
+    console.log(nodes)
+});
+
+function unfreeze() {
+
+    nodes = simulation.nodes()
+
+    // nodes[0].attractionTarget = [width * (3/4), 900]
+
+    simulation.nodes(nodes)
+
+    simulation.alpha(1).restart()
+    nodes = nodes.map((node) => {
+
+        node.attractionTarget = node.domestic ? [width * 3/4, 900] : [width * 1/4, 900]
+
+
+        node.x = node.fx
+        node.y = node.fy
+        node.vx = 0
+        node.vy = 0
+        node.fx = null
+        node.fy = null
+
+        return node
+    })
+}
+
+function nextStep() {
+
+    nodes = simulation.nodes()
+
+    console.log("HERE")
+    console.log(nodes)
+
+    nodes = nodes.map((node) => {
+        console.log(node)
+        node.attractionTarget = projectionDomestic([node.lat ,node.lng])
+        node.attractionTarget[1] += Number(heightGlobe) + Number(400)
+
+        return node
+    })
+
+    simulation.alphaTarget(0.3)
+    simulation.alpha(1).restart()
+    simulation.force("x").strength(0.05)
+    simulation.nodes(nodes)
+
+}
+
+var last_known_scroll_position = 0;
+var ticking = false;
+
+var unfreezeCalled = false
+var nextStepCalled = false
+
+function doSomething(scroll_pos) {
+  if (scroll_pos > 300 && unfreezeCalled != true) {
+      unfreeze()
+      unfreezeCalled = true
+  }
+  if (scroll_pos > 800 && nextStepCalled != true) {
+      nextStep()
+      nextStepCalled = true
+  }
+
+
+
+}
+
+window.addEventListener('scroll', function(e) {
+  last_known_scroll_position = window.scrollY;
+  if (!ticking) {
+    window.requestAnimationFrame(function() {
+      doSomething(last_known_scroll_position);
+      ticking = false;
+    });
+  }
+  ticking = true;
+});
 
 </script>

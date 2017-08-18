@@ -3,7 +3,7 @@ import json
 
 API_KEY = "AIzaSyAEzJWmWAvKCwhkaBXAzCnDFPBXmo2Jc1g"
 
-addrList = ["697 West End Ave, New York City, NY, 10025, United States", "1600 Pennsylvania Ave, Washington DC, United States"]
+addrList = ["697 West End Ave, New York City, NY, 10025, United States", "1600 Pennsylvania Ave, Washington DC, United States", "86 Douglas Road Needham, MA 02492"]
 
 output = {
     "type" : "FeatureCollection",
