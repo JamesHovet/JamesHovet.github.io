@@ -1,0 +1,254 @@
+
+var width = window.innerWidth
+|| document.documentElement.clientWidth
+|| document.body.clientWidth
+
+width = width < 1000 ? width : 1000
+
+var height = 4000
+
+var heightGlobe = width * (600/960)
+
+var heights = {
+    startingState : 0,
+    get startingState() { return 0},//height globe
+    internationalCluster : 0,
+    get internationalCluster() {return this.startingState + heightGlobe},//height 400
+    unitedStatesMap : 0,
+    get unitedStatesMap() {return this.internationalCluster + 400},//height globe
+    ordinalStateCluster : 0,
+    get ordinalStateCluster() {return this.unitedStatesMap + heightGlobe}, // height 400
+    genderCluster : 0,
+    get genderCluster() {return this.ordinalStateCluster + 400}, //height 600
+    schoolTypeCluster : 0,
+    get schoolTypeCluster() {return this.genderCluster + 600}, //height 400
+}
+
+var svg;
+var projectionGlobal;
+var pathGlobal;
+var projectionDomestic;
+var pathDomestic;
+
+drawMaps()
+
+//draw text
+var padding = 50
+
+aside1 = positionAside("#aside1", heights.internationalCluster + 50)
+aside2 = positionAside("#aside2", heights.unitedStatesMap - 50)
+aside3 = positionAside("#aside3", heights.ordinalStateCluster)
+aside4 = positionAside("#aside4", heights.genderCluster)
+aside5 = positionAside("#aside5", heights.schoolTypeCluster)
+
+//international axis
+var ordinalInternationalScale = d3.scaleOrdinal()
+    .domain([true,false])
+    .range([getX(0,2),getX(1,2)])
+
+var internationalXAxis = drawAxis(
+    ordinalInternationalScale,
+    Number(heightGlobe + 200 + 100),
+    tickValues=["Domestic","International"],
+    className="international"
+)
+
+var ordinalGenderScale = d3.scaleOrdinal()
+    .domain(["M", "F"])
+    .range([
+        heights.genderCluster + (500 * (1/4)),
+        heights.genderCluster + (500 * (3/4))
+    ])
+
+var genderYAxis = d3.axisLeft()
+    .scale(ordinalGenderScale)
+
+svg.append("g")
+    .attr("class", "axis axis_" + "gender")
+    .attr("transform", "translate(" + width/8 + "," + 0 + ")")
+    .call(genderYAxis)
+
+
+var ordinalFormScale = d3.scaleOrdinal()
+    .domain([2,3,4,5])
+    .range([
+        getX(0,4),
+        getX(1,4),
+        getX(2,4),
+        getX(3,4)
+    ])
+
+var formXAxis = drawAxis(
+    ordinalFormScale,
+    heights.genderCluster + 500,
+    tickValues=["II","III","IV","V"],
+    className="form"
+)
+
+var ordinalSchoolTypeScale = d3.scaleOrdinal()
+    .domain(["Private", "Public"])
+    .range([getX(0,2),getX(1,2)])
+
+var schoolTypeXAxis = drawAxis(
+    ordinalSchoolTypeScale,
+    heights.schoolTypeCluster + 300
+)
+
+//draw points
+
+var nodes;
+
+var simulation = d3.forceSimulation();
+
+var geographicStates = {}
+
+var ordinalStateScale
+
+d3.json("./testGeoJson.geojson", function (error, data) {
+
+    nodes = data.features.map((d) => {
+
+        if(d["properties"]["isUSA"]) {
+            state = d["properties"]["state"]
+            if(geographicStates[state] == null){
+                geographicStates[state] = 0
+            }
+            geographicStates[state] += 1
+        } else {
+            state = "International"
+        }
+
+        coords = projectionGlobal(d["geometry"]["coordinates"])
+        latLng = d["geometry"]["coordinates"]
+        node = {
+            lat : latLng[0],
+            lng : latLng[1],
+            fx : coords[0],
+            fy : coords[1],
+            start : coords,
+            attractionTarget: [width/4, heightGlobe + 200],
+            radius : 5,
+            domestic: d["properties"]["isUSA"] ? true : false,
+            state : state,
+            gender : d["properties"]["gender"],
+            form : d["properties"]["form"],
+            schoolType : d["properties"]["schoolType"],
+        }
+        return node
+    })
+
+    ordinalStateScale = makeOrdinalScale(geographicStates)
+
+    var stateXAxis = drawAxis(ordinalStateScale, Number(heightGlobe + heightGlobe + 400 + 200 + 100))
+
+    //simulation
+    simulation
+        .force("x", d3.forceX(function(d) {
+            return d.attractionTarget[0];
+        }).strength(0.04))
+        .force("y", d3.forceY(function(d) {
+            return d.attractionTarget[1];
+        }).strength(0.04))
+        .force("collide", d3.forceCollide((d) => {return d.radius; }))
+        .force("attraction", d3.forceManyBody().strength(3))
+
+        .alphaTarget(0.3)
+
+    simulation.nodes(nodes)
+
+    simulation.on("tick", function(e) {
+        svg.selectAll("circle")
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+        .attr("r", function(d) { return d.radius; })
+    });
+
+    //draw to svg
+    svg.selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.x; })
+        .attr("r", function(d) { return d.radius; })
+        .attr("class", "point")
+        .classed("domestic", (d) => {
+                return d.domestic ? true : false
+            })
+    // console.log(nodes)
+
+});
+
+//top y coords
+
+
+var stops = [
+    heights.startingState,
+    heights.internationalCluster - 300,
+    heights.unitedStatesMap - 200,
+    heights.unitedStatesMap + 100,
+    heights.genderCluster - 300,
+    heights.schoolTypeCluster - 300,
+    99999999
+]
+
+var i = 0
+
+var states = [
+    {name : "startingState", f : setToStart, min : stops[i], max : stops[++i] },
+    {name : "internationalCluster", f : setToInternationalCluster, min: stops[i] , max : stops[++i]},
+    {name : "unitedStatesMap", f : setToUnitedStatesMap, min : stops[i], max: stops[++i]},
+    {name : "ordinalStateCluster", f : setToOrdinalStateCluster, min : stops[i], max: stops[++i]},
+    {name : "genderCluster", f : setToGenderCluster, min : stops[i], max: stops[++i]},
+    {name : "schoolTypeCluster", f : setToSchoolTypeCluster, min : stops[i], max: stops[++i]},
+    //TBD
+]
+
+function showDebugStates(){
+    var color = d3.scaleOrdinal(d3.schemeCategory10)
+
+    svg.append("g")
+        .selectAll("rect")
+        .data(states)
+        .enter()
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", (d) => {return d.min - 200; })
+        .attr("height", (d) => {return d.max - d.min})
+        .attr("width", 30)
+        .attr("fill", (d, i) => {return color(i); })
+
+}
+
+//DELETE ME
+// showDebugStates()
+
+function debug() {
+    showDebugStates()
+}
+
+currentState = "startingState"
+
+function setStateFromScroll(scroll_pos) {
+    states.map((state) => {
+        if (scroll_pos > state.min && scroll_pos < state.max && state.name != currentState)
+
+        state.f()
+        currentState = state.name
+
+    })
+}
+
+var last_known_scroll_position = 0;
+var ticking = false;
+
+window.addEventListener('scroll', function(e) {
+  last_known_scroll_position = window.scrollY;
+  if (!ticking) {
+    window.requestAnimationFrame(function() {
+      setStateFromScroll(last_known_scroll_position);
+      ticking = false;
+    });
+  }
+  ticking = true;
+});
