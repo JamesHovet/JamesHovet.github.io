@@ -104,7 +104,12 @@ body svg {
 
         <foreignObject id="aside1" x="46" y="22" width="200" height="300">
             <body xmlns="http://www.w3.org/1999/xhtml">
-                <div class="aside">&#9;Groton is welcoming 104 new students this fall, 11 of whom identify as international.</div>
+                <div class="aside">Groton is welcoming 104 new students this fall, 11 of whom identify as international.</div>
+            </body>
+        </foreignObject>
+        <foreignObject id="aside2" x="46" y="22" width="200" height="300">
+            <body xmlns="http://www.w3.org/1999/xhtml">
+                <div class="aside">The remaining 93 students represent 24 differnt states.</div>
             </body>
         </foreignObject>
 
@@ -123,14 +128,16 @@ var height = 2000
 
 var heightGlobe = width * (600/960)
 
-
-
 //draw globe
 var projectionGlobal = d3.geoWinkel3()
     .scale(width * (182/960))
     .translate([width / 2, heightGlobe / 2])
     .precision(.1)
 
+var projectionGlobal = d3.geoKavrayskiy7()
+    .scale(width * (170/960))
+    .translate([width / 2, heightGlobe / 2])
+    .precision(.1)
 
 var pathGlobal = d3.geoPath(projectionGlobal)
 
@@ -223,6 +230,11 @@ d3.json("./us.json", function(error, us) {
         .attr("y", heightGlobe + padding)
         .attr("width", width/2)
 
+    aside2 = d3.select("#aside2")
+        .attr("x", width/8)
+        .attr("y", heightGlobe + 400 + heightGlobe )
+        .attr("width", width/2)
+
 //draw points
 
 var nodes
@@ -242,7 +254,7 @@ d3.json("./testGeoJson.geojson", function (error, data) {
             fx : coords[0],
             fy : coords[1],
             start : coords,
-            attractionTarget: [width/4, 900],
+            attractionTarget: [width/4, 800],
             radius : 5,
             domestic: d["properties"]["isUSA"] ? true : false
         }
@@ -253,14 +265,14 @@ d3.json("./testGeoJson.geojson", function (error, data) {
     simulation
         .force("x", d3.forceX(function(d) {
             return d.attractionTarget[0];
-        }).strength(0.005))
+        }).strength(0.05))
         .force("y", d3.forceY(function(d) {
             return d.attractionTarget[1];
         }).strength(0.05))
         .force("collide", d3.forceCollide(5))
         .force("attraction", d3.forceManyBody().strength(3))
 
-        // .alphaTarget(0.3)
+        .alphaTarget(0.3)
 
     simulation.nodes(nodes)
 
@@ -285,78 +297,81 @@ d3.json("./testGeoJson.geojson", function (error, data) {
     console.log(nodes)
 });
 
-function unfreeze() {
-
+function setToStart() {
     nodes = simulation.nodes()
 
-    // nodes[0].attractionTarget = [width * (3/4), 900]
-
-    simulation.nodes(nodes)
-
+    nodes = nodes.map((node) => {
+        node.attractionTarget = node.start
+        return node
+    })
     simulation.alpha(1).restart()
+    simulation.nodes(nodes)
+    //take away collision and attraction
+    simulation.force("collide", null)
+    simulation.force("attraction", null)
+}
+
+function setToInternationalCluster() {
+    nodes = simulation.nodes()
+
     nodes = nodes.map((node) => {
 
-        node.attractionTarget = node.domestic ? [width * 3/4, 900] : [width * 1/4, 900]
+        node.attractionTarget = node.domestic ? [width * 3/4, 800] : [width * 1/4, 800]
 
-
-        node.x = node.fx
-        node.y = node.fy
-        node.vx = 0
-        node.vy = 0
         node.fx = null
         node.fy = null
 
         return node
     })
+    simulation.alpha(1).restart()
+    simulation.nodes(nodes)
+    //add back the physics
+    .force("collide", d3.forceCollide(5))
+    .force("attraction", d3.forceManyBody().strength(3))
 }
 
-function nextStep() {
-
+function setToUnitedStatesMap() {
     nodes = simulation.nodes()
 
-    console.log("HERE")
-    console.log(nodes)
-
     nodes = nodes.map((node) => {
-        console.log(node)
         node.attractionTarget = projectionDomestic([node.lat ,node.lng])
         node.attractionTarget[1] += Number(heightGlobe) + Number(400)
-
         return node
     })
-
-    simulation.alphaTarget(0.3)
     simulation.alpha(1).restart()
-    simulation.force("x").strength(0.05)
     simulation.nodes(nodes)
+    //take away collision and attraction
+    simulation.force("collide", null)
+    simulation.force("attraction", null)
+}
 
+states = [
+    {name : "startingState", f : setToStart, min : 0, max : heightGlobe/2},
+    {name : "internationalCluster", f : setToInternationalCluster, min: heightGlobe/2, max : heightGlobe + 200},
+    {name : "unitedStatesMap", f : setToUnitedStatesMap, min : heightGlobe + 200, max: 999999999}
+    //TBD
+]
+
+currentState = "startingState"
+
+function setStateFromScroll(scroll_pos) {
+    states.map((state) => {
+        if (scroll_pos > state.min && scroll_pos < state.max && state.name != currentState)
+
+        state.f()
+        currentState = state.name
+
+    })
 }
 
 var last_known_scroll_position = 0;
 var ticking = false;
 
-var unfreezeCalled = false
-var nextStepCalled = false
-
-function doSomething(scroll_pos) {
-  if (scroll_pos > 300 && unfreezeCalled != true) {
-      unfreeze()
-      unfreezeCalled = true
-  }
-  if (scroll_pos > 800 && nextStepCalled != true) {
-      nextStep()
-      nextStepCalled = true
-  }
-
-
-
-}
-
 window.addEventListener('scroll', function(e) {
   last_known_scroll_position = window.scrollY;
   if (!ticking) {
     window.requestAnimationFrame(function() {
-      doSomething(last_known_scroll_position);
+      setStateFromScroll(last_known_scroll_position);
       ticking = false;
     });
   }
