@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+
+    <style>
+        .link {
+            stroke-width: 8px;
+
+        }
+
+        body {
+            background-color: #E6E7E9
+        }
+    </style>
+
+</head>
+<body>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</body>
+
+<script>
+
+var width = 600
+var height = 600
+
+gridWidth = 30
+
+numGridLines = width / gridWidth
+
+function clamp(a) {
+    x = Math.round(a[0] / numGridLines) * numGridLines
+    y = Math.round(a[1] / numGridLines) * numGridLines
+
+    return [x,y]
+}
+
+var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+
+var tubeColors = [
+    "#B36305",
+    "#E32017",
+    "#FFD300",
+    "#00782A",
+    "#F3A9BB",
+    "#A0A5A9",
+    "#9B0056",
+    "#000000",
+    "#003688",
+    "#0098D4",
+    "#95CDBA",
+    "#00A4A7",
+    "#EE7C0E",
+    "#84B817",
+]
+
+var nodes = []
+
+svg.on("click", (d) => {
+    console.log(this)
+    var coords = d3.mouse(svg.node())
+
+    console.log(coords)
+
+    coords = clamp(coords)
+
+    node = {
+        x : coords[0],
+        y : coords[1],
+        index : nodes.length
+    }
+
+    nodes.push(node)
+
+    svg.selectAll("circle")  // For new circle, go through the update process
+            .data(nodes)
+            .enter()
+            .append("circle")
+            .attr("cx", node.x)
+            .attr("cy", node.y)
+            .attr("r", 8)
+            .attr("fill", tubeColors[1])
+
+    if(nodes.length > 1) {
+        i = nodes.length - 1
+        drawLink(nodes[i-1]["x"],nodes[i-1]["y"], nodes[i]["x"], nodes[i]["y"],startFirst= i % 2)
+    }
+})
+
+function drawLink(x1,y1,x2,y2, startFirst=false) {
+    xDist = Math.abs(x1 - x2)
+    yDist = Math.abs(y1 - y2)
+    dif = Math.abs(xDist - yDist)
+
+    if (startFirst != true) {
+        tmpX = x1
+        tmpY = y1
+        x1 = x2
+        y1 = y2
+        x2 = tmpX
+        y2 = tmpY
+    }
+
+    if (xDist > yDist) {
+        console.log("lead with x")
+        dif = x1 < x2 ? dif : -dif
+        d = "M " + x1 + " " + y1 + "l" + dif + " 0 L " + x2 + " " + y2
+    } else {
+        console.log("lead with y")
+        dif = y1 < y2 ? dif : -dif
+        d = "M " + x1 + " " + y1 + "l" + "0 " + dif + " L " + x2 + " " + y2
+    }
+
+    svg.append("path")
+        .attr("d", d)
+        .attr("fill", "none")
+        .attr("class", "link")
+        .attr("stroke", tubeColors[1])
+}
+
+
+
+</script>
