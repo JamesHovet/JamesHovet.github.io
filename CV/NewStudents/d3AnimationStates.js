@@ -34,15 +34,34 @@ function setToInternationalCluster() {
     .force("attraction", d3.forceManyBody().strength(attractionStrength))
 }
 
+function setToCountryOrdinal() {
+    nodes = simulation.nodes()
+
+    nodes = nodes.map((node) => {
+        if (node.country != "USA") {
+            node.attractionTarget = [ordinalCountryScale(node.country), heights.ordinalCountry + 200]
+        } else {
+            node.attractionTarget = [width + 300,heights.ordinalCountry + 200]
+        }
+
+        return node
+    })
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
+    simulation.nodes(nodes)
+    //add back the physics
+    .force("collide", d3.forceCollide((d) => {return d.radius; }))
+    .force("attraction", d3.forceManyBody().strength(attractionStrength))
+}
+
 function setToUnitedStatesMap() {
     nodes = simulation.nodes()
 
     nodes = nodes.map((node) => {
         if (node.domestic) {
             node.attractionTarget = projectionDomestic([node.lat ,node.lng])
-            node.attractionTarget[1] += Number(heightGlobe) + Number(400)
+            node.attractionTarget[1] += heights.unitedStatesMap
         } else {
-            node.attractionTarget = [width + 300, Number(heightGlobe) + Number(400) + Number(heightGlobe)/2]
+            node.attractionTarget = [width + 300, heights.unitedStatesMap]
         }
 
         return node
@@ -60,9 +79,9 @@ function setToOrdinalStateCluster() {
 
     nodes = nodes.map((node) => {
         if (node.domestic) {
-            node.attractionTarget = [ordinalStateScale(node.state), heightGlobe + heightGlobe + 400 + 200]
+            node.attractionTarget = [ordinalStateScale(node.state), heights.ordinalStateCluster + 200]
         } else {
-            node.attractionTarget = [width + 300, heightGlobe + heightGlobe + 400 + 200]
+            node.attractionTarget = [width + 300,heights.ordinalStateCluster + 200]
         }
 
         return node

@@ -13,8 +13,10 @@ var heights = {
     get startingState() { return 0},//height globe
     internationalCluster : 0,
     get internationalCluster() {return this.startingState + heightGlobe},//height 400
+    ordinalCountry : 0,
+    get ordinalCountry() {return this.internationalCluster + 400}, //height map
     unitedStatesMap : 0,
-    get unitedStatesMap() {return this.internationalCluster + 400},//height globe
+    get unitedStatesMap() {return this.ordinalCountry + 400},//height globe
     ordinalStateCluster : 0,
     get ordinalStateCluster() {return this.unitedStatesMap + heightGlobe}, // height 400
     genderCluster : 0,
@@ -35,6 +37,7 @@ drawMaps()
 var padding = 50
 
 aside1 = positionAside("#aside1", heights.internationalCluster + 50)
+aside1 = positionAside("#aside1point5", heights.ordinalCountry)
 aside2 = positionAside("#aside2", heights.unitedStatesMap - 50)
 aside3 = positionAside("#aside3", heights.ordinalStateCluster)
 aside4 = positionAside("#aside4", heights.genderCluster)
@@ -109,22 +112,30 @@ function step() {
 }
 
 var geographicStates = {}
+var countries = {}
 
 var ordinalStateScale
+var ordinalCountryScale
 
 d3.json("./outputGeoJson.geojson", function (error, data) {
 
     filtered = data.features.filter((d) => {
         // console.log(d["properties"]["isNew"])
         // console.log(d["geometry"]["coordinates"][0])
-        return d["properties"]["isNew"] == "true" && d["geometry"]["coordinates"][0] != 0
+        return d["properties"]["isNew"] == "true"
         // return d["geometry"]["coordinates"][0] != 0
     })
 
     nodes = filtered.map((d) => {
 
+        //if coordinates are absent, just put them at the GPS coordinates for Groton
+        if (d["geometry"]["coordinates"][0] == 0){
+            d["geometry"]["coordinates"] = [-71.584016, 42.593495]
+        }
+
         isUSA = d["properties"]["isUSA"]
         state = d["properties"]["state"]
+        country = d["properties"]["country"]
 
         if(isUSA && state != "NONE" ) {
             if(geographicStates[state] == null){
@@ -133,6 +144,13 @@ d3.json("./outputGeoJson.geojson", function (error, data) {
             geographicStates[state] += 1
         } else {
             state = "International"
+        }
+
+        if(country != "USA") {
+            if(countries[country] == null){
+                countries[country] = 0
+            }
+            countries[country] += 1
         }
 
         coords = projectionGlobal(d["geometry"]["coordinates"])
@@ -150,6 +168,7 @@ d3.json("./outputGeoJson.geojson", function (error, data) {
             gender : d["properties"]["gender"],
             form : d["properties"]["form"],
             schoolType : d["properties"]["schoolType"],
+            country: country
         }
         return node
     })
@@ -158,7 +177,11 @@ d3.json("./outputGeoJson.geojson", function (error, data) {
 
     ordinalStateScale = makeOrdinalScale(geographicStates, max=6)
 
-    var stateXAxis = drawAxis(ordinalStateScale, Number(heightGlobe + heightGlobe + 400 + 200 + 100))
+    var stateXAxis = drawAxis(ordinalStateScale, heights.ordinalStateCluster + 300)
+
+    ordinalCountryScale = makeOrdinalScale(countries)
+
+    var countryXAis = drawAxis(ordinalCountryScale, heights.ordinalCountry + 250)
 
     //simulation
     simulation
@@ -202,6 +225,7 @@ d3.json("./outputGeoJson.geojson", function (error, data) {
 var stops = [
     heights.startingState,
     heights.internationalCluster - 300,
+    heights.ordinalCountry - 300,
     heights.unitedStatesMap - 200,
     heights.unitedStatesMap + 100,
     heights.genderCluster - 300,
@@ -214,6 +238,7 @@ var i = 0
 var states = [
     {name : "startingState", f : setToStart, min : stops[i], max : stops[++i] },
     {name : "internationalCluster", f : setToInternationalCluster, min: stops[i] , max : stops[++i]},
+    {name : "ordinalCountry", f : setToCountryOrdinal, min: stops[i] , max : stops[++i]},
     {name : "unitedStatesMap", f : setToUnitedStatesMap, min : stops[i], max: stops[++i]},
     {name : "ordinalStateCluster", f : setToOrdinalStateCluster, min : stops[i], max: stops[++i]},
     {name : "genderCluster", f : setToGenderCluster, min : stops[i], max: stops[++i]},

@@ -65,7 +65,7 @@ function drawMaps(){//draw globe
 
     var gDomestic = svg.append("g")
         .attr("id", "domestic")
-        .attr("transform", "translate(0," + (Number(heightGlobe) + Number(400.0)) + ")")
+        .attr("transform", "translate(0," + heights.unitedStatesMap + ")")
 
     d3.json("./us_states_5m.geojson", function(error, us) {
         if (error) throw error;
