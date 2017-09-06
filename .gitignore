@@ -2,3 +2,5 @@
 *.PSD
 *.psd
 *.API_KEY
+*.xlsx
+build/

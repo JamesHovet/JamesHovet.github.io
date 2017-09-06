@@ -10,7 +10,7 @@ function drawAxis(scale, yPos, tickValues=null, className="default"){
     return axis
 }
 
-function makeOrdinalScale(dict) {
+function makeOrdinalScale(dict, max=null) {
     sortable = Object.keys(dict).map((key) => {
         return [key, dict[key]]
     })
@@ -23,13 +23,18 @@ function makeOrdinalScale(dict) {
 
     sorted = sortable.map((d) => {return d[0]; })
 
+    if(max){
+        sorted = sorted.slice(0,max)
+    }
+
     range = [...Array(sorted.length).keys()].map((index) => {
-        return getX(index, sorted.length)
+        return getX(index, sorted.length )
     })
 
     scale = d3.scaleOrdinal()
         .domain(sorted)
         .range(range)
+        .unknown(width + 200)//get the unkowns off the screen
 
     return scale
 }

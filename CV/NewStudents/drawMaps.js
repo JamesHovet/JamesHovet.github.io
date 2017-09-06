@@ -59,7 +59,7 @@ function drawMaps(){//draw globe
         .scale(width * 1070/1000)
         .translate([width / 2, heightGlobe / 2])
 
-    console.log(projectionDomestic.scale())
+    // console.log(projectionDomestic.scale())
 
     pathDomestic = d3.geoPath(projectionDomestic)
 
@@ -70,7 +70,7 @@ function drawMaps(){//draw globe
     d3.json("./us_states_5m.geojson", function(error, us) {
         if (error) throw error;
 
-        console.log(us)
+        // console.log(us)
 
         // gDomestic.insert("path")
         //   .datum(us)
