@@ -1,5 +1,5 @@
-var attractionStrength = 0.01
-var standardAlphaTarget = 0.1
+var attractionStrength = 0.1
+var standardAlphaTarget = 0.3
 
 function setToStart() {
     nodes = simulation.nodes()
@@ -119,6 +119,44 @@ function setToSchoolTypeCluster() {
         node.attractionTarget = [
             ordinalSchoolTypeScale(node.schoolType),
             heights.schoolTypeCluster + 200
+        ]
+        return node
+    })
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
+    simulation.nodes(nodes)
+    //add back the physics
+    .force("collide", d3.forceCollide((d) => {return d.radius; }))
+    .force("attraction", d3.forceManyBody().strength(attractionStrength))
+}
+
+//TODO
+
+function setToOrdinalRepresentaion() {
+    nodes = simulation.nodes()
+
+    nodes = nodes.map((node) => {
+
+        node.attractionTarget = [
+            ordinalRepresentationScale(node.group),
+            heights.ordinalRepresentation + 200
+        ]
+        return node
+    })
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
+    simulation.nodes(nodes)
+    //add back the physics
+    .force("collide", d3.forceCollide((d) => {return d.radius; }))
+    .force("attraction", d3.forceManyBody().strength(attractionStrength))
+}
+
+function setToOrdinalDayStudents() {
+    nodes = simulation.nodes()
+
+    nodes = nodes.map((node) => {
+
+        node.attractionTarget = [
+            ordinalDayStudentsScale(node.boarding),
+            heights.ordinalDayStudents + 200
         ]
         return node
     })
