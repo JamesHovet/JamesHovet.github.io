@@ -4,7 +4,7 @@ var width = window.innerWidth
 
 width = width < 1000 ? width : 1000
 
-var height = 4000
+var height = 4500
 
 var heightGlobe = width * (600/960)
 
@@ -23,6 +23,10 @@ var heights = {
     get genderCluster() {return this.ordinalStateCluster + 400}, //height 600
     schoolTypeCluster : 0,
     get schoolTypeCluster() {return this.genderCluster + 600}, //height 400
+    ordinalRepresentation : 0,
+    get ordinalRepresentation() {return this.schoolTypeCluster + 400}, //height 400
+    ordinalDayStudents : 0,
+    get ordinalDayStudents() {return this.ordinalRepresentation + 400},
 }
 
 var svg;
@@ -37,21 +41,23 @@ drawMaps()
 var padding = 50
 
 aside1 = positionAside("#aside1", heights.internationalCluster + 50)
-aside1 = positionAside("#aside1point5", heights.ordinalCountry)
+aside1point5 = positionAside("#aside1point5", heights.ordinalCountry)
 aside2 = positionAside("#aside2", heights.unitedStatesMap - 50)
 aside3 = positionAside("#aside3", heights.ordinalStateCluster)
 aside4 = positionAside("#aside4", heights.genderCluster)
 aside5 = positionAside("#aside5", heights.schoolTypeCluster)
+aside6 = positionAside("#aside6", heights.ordinalRepresentation)
+aside7 = positionAside("#aside7", heights.ordinalDayStudents)
 
 //international axis
 var ordinalInternationalScale = d3.scaleOrdinal()
-    .domain([true,false])
+    .domain([false,true])
     .range([getX(0,2),getX(1,2)])
 
 var internationalXAxis = drawAxis(
     ordinalInternationalScale,
     Number(heightGlobe + 200 + 100),
-    tickValues=["Domestic","International"],
+    tickValues=["International","Domestic"],
     className="international"
 )
 
@@ -62,8 +68,10 @@ var ordinalGenderScale = d3.scaleOrdinal()
         heights.genderCluster + (500 * (3/4))
     ])
 
+
 var genderYAxis = d3.axisLeft()
     .scale(ordinalGenderScale)
+    
 
 svg.append("g")
     .attr("class", "axis axis_" + "gender")
@@ -94,6 +102,26 @@ var ordinalSchoolTypeScale = d3.scaleOrdinal()
 var schoolTypeXAxis = drawAxis(
     ordinalSchoolTypeScale,
     heights.schoolTypeCluster + 300
+)
+
+var ordinalRepresentationScale = d3.scaleOrdinal()
+    .domain(["MA_Private","MA_Public", "NY_Private", "Other"])
+    .range([getX(0,4),getX(1,4),getX(2,4),getX(3,4)])
+
+var ordinalRepresentationXAxis = drawAxis(
+    ordinalRepresentationScale,
+    heights.ordinalRepresentation + 300,
+    tickValues=["MA Private", "MA Public", "NY Private", "Other"]
+)
+
+var ordinalDayStudentsScale = d3.scaleOrdinal()
+    .domain(["D","B"])
+    .range([getX(1,2),getX(0,2)])
+
+
+var ordinalDayStudentsXAxis = drawAxis(
+    ordinalDayStudentsScale,
+    heights.ordinalDayStudents + 300
 )
 
 //draw points
@@ -136,6 +164,17 @@ d3.json("./outputGeoJson.geojson", function (error, data) {
         isUSA = d["properties"]["isUSA"]
         state = d["properties"]["state"]
         country = d["properties"]["country"]
+        schoolType = d["properties"]["schoolType"]
+
+        if (state == "MA" && schoolType == "Private"){
+            group = "MA_Private"
+        } else if (state == "MA") {
+            group = "MA_Public"
+        } else if (state == "NY" && schoolType == "Private") {
+            group = "NY_Private"
+        } else {
+            group = "Other"
+        }
 
         if(isUSA && state != "NONE" ) {
             if(geographicStates[state] == null){
@@ -167,8 +206,10 @@ d3.json("./outputGeoJson.geojson", function (error, data) {
             state : state,
             gender : d["properties"]["gender"],
             form : d["properties"]["form"],
-            schoolType : d["properties"]["schoolType"],
-            country: country
+            schoolType : schoolType,
+            country: country,
+            group: group,
+            boarding: d["properties"]["boarder"]
         }
         return node
     })
@@ -230,6 +271,8 @@ var stops = [
     heights.unitedStatesMap + 100,
     heights.genderCluster - 300,
     heights.schoolTypeCluster - 300,
+    heights.ordinalRepresentation - 300,
+    heights.ordinalDayStudents - 300,
     99999999
 ]
 
@@ -243,6 +286,8 @@ var states = [
     {name : "ordinalStateCluster", f : setToOrdinalStateCluster, min : stops[i], max: stops[++i]},
     {name : "genderCluster", f : setToGenderCluster, min : stops[i], max: stops[++i]},
     {name : "schoolTypeCluster", f : setToSchoolTypeCluster, min : stops[i], max: stops[++i]},
+    {name : "ordinalRepresentaion", f : setToOrdinalRepresentaion, min : stops[i], max: stops[++i]},
+    {name : "ordinalDayStudents", f : setToOrdinalDayStudents, min : stops[i], max: stops[++i]}
     //TBD
 ]
 
@@ -273,11 +318,11 @@ currentState = "startingState"
 
 function setStateFromScroll(scroll_pos) {
     states.map((state) => {
-        if (scroll_pos > state.min && scroll_pos < state.max && state.name != currentState)
+        if (scroll_pos > state.min && scroll_pos < state.max && state.name != currentState){
 
-        state.f()
-        currentState = state.name
-
+            state.f()
+            currentState = state.name
+        }
     })
 }
 
