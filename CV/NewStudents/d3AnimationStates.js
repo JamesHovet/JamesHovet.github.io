@@ -1,3 +1,6 @@
+var attractionStrength = 0.01
+var standardAlphaTarget = 0.1
+
 function setToStart() {
     nodes = simulation.nodes()
 
@@ -5,7 +8,7 @@ function setToStart() {
         node.attractionTarget = node.start
         return node
     })
-    simulation.alpha(1).restart()
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
     simulation.nodes(nodes)
     //take away collision and attraction
     simulation.force("collide", null)
@@ -24,11 +27,11 @@ function setToInternationalCluster() {
 
         return node
     })
-    simulation.alpha(1).restart()
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
     simulation.nodes(nodes)
     //add back the physics
     .force("collide", d3.forceCollide((d) => {return d.radius; }))
-    .force("attraction", d3.forceManyBody().strength(3))
+    .force("attraction", d3.forceManyBody().strength(attractionStrength))
 }
 
 function setToUnitedStatesMap() {
@@ -44,11 +47,12 @@ function setToUnitedStatesMap() {
 
         return node
     })
-    simulation.alpha(1).restart()
+    simulation.alpha(1).alphaTarget(1).restart()
     simulation.nodes(nodes)
     //take away collision and attraction
-    .force("collide", d3.forceCollide((d) => {return d.radius/2; }))
+    .force("collide", d3.forceCollide((d) => {return d.radius/4; }))
     simulation.force("attraction", null)
+    // simulation.force("collide", null)
 }
 
 function setToOrdinalStateCluster() {
@@ -63,11 +67,11 @@ function setToOrdinalStateCluster() {
 
         return node
     })
-    simulation.alpha(1).restart()
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
     simulation.nodes(nodes)
     //add back the physics
     .force("collide", d3.forceCollide((d) => {return d.radius; }))
-    .force("attraction", d3.forceManyBody().strength(3))
+    .force("attraction", d3.forceManyBody().strength(attractionStrength))
 }
 
 function setToGenderCluster() {
@@ -81,11 +85,11 @@ function setToGenderCluster() {
         ]
         return node
     })
-    simulation.alpha(1).restart()
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
     simulation.nodes(nodes)
     //add back the physics
     // .force("collide", d3.forceCollide((d) => {return d.radius; }))
-    // .force("attraction", d3.forceManyBody().strength(3))
+    // .force("attraction", d3.forceManyBody().strength(attractionStrength))
 }
 
 function setToSchoolTypeCluster() {
@@ -99,9 +103,9 @@ function setToSchoolTypeCluster() {
         ]
         return node
     })
-    simulation.alpha(1).restart()
+    simulation.alpha(1).alphaTarget(standardAlphaTarget).restart()
     simulation.nodes(nodes)
     //add back the physics
-    // .force("collide", d3.forceCollide((d) => {return d.radius; }))
-    // .force("attraction", d3.forceManyBody().strength(3))
+    .force("collide", d3.forceCollide((d) => {return d.radius; }))
+    .force("attraction", d3.forceManyBody().strength(attractionStrength))
 }

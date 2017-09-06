@@ -1,4 +1,3 @@
-
 var width = window.innerWidth
 || document.documentElement.clientWidth
 || document.body.clientWidth
@@ -98,18 +97,36 @@ var schoolTypeXAxis = drawAxis(
 
 var nodes;
 
+var frameRate = 25
+
 var simulation = d3.forceSimulation();
+
+function step() {
+    svg.selectAll("circle")
+    .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; })
+    .attr("r", function(d) { return d.radius; })
+}
 
 var geographicStates = {}
 
 var ordinalStateScale
 
-d3.json("./testGeoJson.geojson", function (error, data) {
+d3.json("./outputGeoJson.geojson", function (error, data) {
 
-    nodes = data.features.map((d) => {
+    filtered = data.features.filter((d) => {
+        // console.log(d["properties"]["isNew"])
+        // console.log(d["geometry"]["coordinates"][0])
+        return d["properties"]["isNew"] == "true" && d["geometry"]["coordinates"][0] != 0
+        // return d["geometry"]["coordinates"][0] != 0
+    })
 
-        if(d["properties"]["isUSA"]) {
-            state = d["properties"]["state"]
+    nodes = filtered.map((d) => {
+
+        isUSA = d["properties"]["isUSA"]
+        state = d["properties"]["state"]
+
+        if(isUSA && state != "NONE" ) {
             if(geographicStates[state] == null){
                 geographicStates[state] = 0
             }
@@ -128,7 +145,7 @@ d3.json("./testGeoJson.geojson", function (error, data) {
             start : coords,
             attractionTarget: [width/4, heightGlobe + 200],
             radius : 5,
-            domestic: d["properties"]["isUSA"] ? true : false,
+            domestic: isUSA,
             state : state,
             gender : d["properties"]["gender"],
             form : d["properties"]["form"],
@@ -137,7 +154,9 @@ d3.json("./testGeoJson.geojson", function (error, data) {
         return node
     })
 
-    ordinalStateScale = makeOrdinalScale(geographicStates)
+    console.log(nodes)
+
+    ordinalStateScale = makeOrdinalScale(geographicStates, max=6)
 
     var stateXAxis = drawAxis(ordinalStateScale, Number(heightGlobe + heightGlobe + 400 + 200 + 100))
 
@@ -150,18 +169,16 @@ d3.json("./testGeoJson.geojson", function (error, data) {
             return d.attractionTarget[1];
         }).strength(0.04))
         .force("collide", d3.forceCollide((d) => {return d.radius; }))
-        .force("attraction", d3.forceManyBody().strength(3))
+        .force("attraction", d3.forceManyBody().strength(0.01).theta(0.5))
 
-        .alphaTarget(0.3)
+        .alphaTarget(0.01)
+        .stop()
 
-    simulation.nodes(nodes)
 
-    simulation.on("tick", function(e) {
-        svg.selectAll("circle")
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; })
-        .attr("r", function(d) { return d.radius; })
-    });
+    simulation.nodes(nodes).tick()
+
+    // simulation.on("tick", (e) => step(e));
+    window.setInterval(step, frameRate)
 
     //draw to svg
     svg.selectAll("circle")
