@@ -21,8 +21,7 @@ img {
     width: auto;
     height: auto;
     min-width: 400px;
-
-
+    max-width: 600px;
 }
 
 h1 {
