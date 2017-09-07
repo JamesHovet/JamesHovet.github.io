@@ -4,8 +4,6 @@ var width = window.innerWidth
 
 width = width < 1000 ? width : 1000
 
-var height = 4500
-
 var heightGlobe = width * (600/960)
 
 var heights = {
@@ -28,6 +26,8 @@ var heights = {
     ordinalDayStudents : 0,
     get ordinalDayStudents() {return this.ordinalRepresentation + 400},
 }
+
+var height = heights.ordinalDayStudents + 1500 //long enough for the top of the screen on mobile to hit the last trigger point
 
 var svg;
 var projectionGlobal;
@@ -71,7 +71,7 @@ var ordinalGenderScale = d3.scaleOrdinal()
 
 var genderYAxis = d3.axisLeft()
     .scale(ordinalGenderScale)
-    
+
 
 svg.append("g")
     .attr("class", "axis axis_" + "gender")
