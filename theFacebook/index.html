@@ -1,0 +1,113 @@
+<script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDldSsoNPHGaSkdT1tC-TG63eojK1YhRig",
+    authDomain: "thefacebook-5a6bc.firebaseapp.com",
+    databaseURL: "https://thefacebook-5a6bc.firebaseio.com",
+    projectId: "thefacebook-5a6bc",
+    storageBucket: "thefacebook-5a6bc.appspot.com",
+    messagingSenderId: "1014458253156"
+  };
+  firebase.initializeApp(config);
+</script>
+
+<body>
+
+    <div style="display:none;" id="playDiv">
+
+        <h2 id="welcome">Welcome, <span id="displayName"></span></h2>
+
+        <a href="./play.html">Play</a>
+        <br>
+        <input id="signOut" type="button" value="Sign Out" onclick="signOut();" />
+
+    </div>
+
+    <div style="display:none;" id="loginDiv">
+        <div id="emailSignIn">
+            <input id="email" type="email" placeholder="email">
+            <br>
+            <input id="password" type="password" placeholder="password">
+            <br>
+            <input id="emailSignIn" type="button" value="Login with email" onclick="emailSignIn();" />
+            <br>
+        </div>
+        <input id="emailCreate" type="button" value="Create new account" onclick="emailCreate();" />
+        <br>
+    </div>
+
+</body>
+
+<script>
+
+loginDiv = document.getElementById('loginDiv')
+playDiv = document.getElementById('playDiv')
+
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+        // User is signed in.
+        var displayName = user.displayName || user.email
+        var uid = user.uid;
+
+
+        nameSpan = document.getElementById('displayName')
+        nameSpan.innerText = displayName
+
+        playDiv.style.display = "block"
+        loginDiv.style.display = "none"
+
+        // ...
+    } else {
+        // User is signed out.
+        // ...
+
+        console.log("else")
+
+        //draw login screen
+        loginDiv.style.display = "block"
+        playDiv.style.display = "none"
+
+
+    }
+});
+
+function emailSignIn(){
+    email = document.getElementById('email').value
+    password = document.getElementById('password').value
+
+    if(email && password){
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .catch(function(err) {
+
+            incorrectErrorElement = document.createElement("p").innerText = err.message
+            document.getElementById('emailSignIn').append(incorrectErrorElement)
+
+            });
+    }
+}
+
+function emailCreate(){
+    email = document.getElementById('email').value
+    password = document.getElementById('password').value
+
+    if(email && password && email.includes("@groton.org")){
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .catch(function(err) {
+
+                incorrectErrorElement = document.createElement("p").innerText = err.message
+                document.getElementById('emailSignIn').append(incorrectErrorElement)
+            // Handle errors
+            });
+    } else {
+        incorrectErrorElement = document.createElement("p").innerText = "Need @groton.org email and valid password"
+
+        document.getElementById('emailSignIn').append(incorrectErrorElement)
+    }
+}
+
+function signOut(){
+    firebase.auth().signOut()
+}
+
+</script>
