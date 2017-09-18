@@ -1,5 +1,15 @@
 <!DOCTYPE HTML>
 <head>
+        <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-104919018-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments)};
+      gtag('js', new Date());
+
+      gtag('config', 'UA-104919018-1');
+    </script>
+
     <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
     <script src="jquery-1.11.1.min.js"></script>
 	<script src="jquery-ui.min.js"></script>
@@ -15,6 +25,8 @@
         messagingSenderId: "1014458253156"
       };
       firebase.initializeApp(config);
+
+      db = firebase.database()
     </script>
     <link rel="stylesheet" href="jquery-ui.css">
 </head>
@@ -54,7 +66,11 @@
 <body>
 
     <div id="above">
-        <h2>Question <span id="questionNumber"></span> of 25</h2>
+        <h1>Question <span id="questionNumber"></span> of 25</h1>
+    </div>
+
+    <div id="timerDiv">
+        <h2 id="timer">0:20</h2>
     </div>
 
     <div id="imgDiv">
@@ -570,33 +586,121 @@
 </body>
 
 <script>
+
+var uid
+
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in.
-        var displayName = user.displayName || user.email
-        var uid = user.uid;
+        uid = user.uid;
 
         console.log(user)
+
+        play()
 
         // ...
     } else {
         // User is signed out.
-        // ...
-
-        console.log("else")
 
         window.location.href = "/theFacebook"
 
     }
 });
 
-function submit(){
+root = db.ref('/')
+
+function addUserSeen(n){
+    console.log("addUser", n)
+    userRef = root.child("users").child(uid)
+
+    userRef.child("seenData").child("seen").push({number: imgNumber})
+
+    userRef.child("seenData").transaction(function(seenData) {
+        // console.log(user)
+        if (seenData) {
+            // console.log(user)
+            if (seenData.seenCount == null){
+                seenData.seenCount = 0
+            }
+            seenData.seenCount ++;
+        }
+        return seenData;
+    });
+
 }
+
+function addPictureSeen(uid){
+    console.log("addPicture", uid)
+    pictureRef = root.child("pictures").child(imgNumber)
+
+    pictureRef.child("seenData").child("seen").push({uid: uid})
+
+    pictureRef.child("seenData").transaction(function(seenData) {
+        // console.log(user)
+        if (seenData) {
+            // console.log(user)
+            if (seenData.seenCount == null){
+                seenData.seenCount = 0
+            }
+            seenData.seenCount ++;
+        }
+        return seenData;
+    });
+}
+
+function addUserCorrect(n){
+    console.log("addUserCorrect", n)
+    userRef = root.child("users").child(uid)
+
+    userRef.child("correctData").child("correct").push({number: imgNumber})
+
+    userRef.child("correctData").transaction(function(correctData) {
+        // console.log(user)
+        if (correctData) {
+            console.log(correctData)
+            if (correctData.correctCount == null){
+                correctData.correctCount = 0
+            }
+            correctData.correctCount ++;
+        }
+        return correctData;
+    });
+
+
+}
+
+function addPictureCorrect(uid){
+    console.log("addPictureCorrect", uid)
+    pictureRef = root.child("pictures").child(imgNumber)
+
+    pictureRef.child("correctData").child("correct").push({uid: uid})
+
+    pictureRef.child("correctData").transaction(function(correctData) {
+        // console.log(user)
+        if (correctData) {
+            console.log(correctData)
+            if (correctData.correctCount == null){
+                correctData.correctCount = 0
+            }
+            correctData.correctCount ++;
+        }
+        return correctData;
+    });
+}
+
+seen = []
 
 function getRandomFromSet(set)
 {
     var randomNumber = Math.floor(Math.random() * set.size);
-    return Array.from(set)[randomNumber];
+    out = Array.from(set)[randomNumber];
+    if (!seen.includes(out)){
+        seen.push(out)
+        return out
+    } else {
+        return getRandomFromSet(set)
+    }
+
 }
 
 var imgOptions = new Set()
@@ -620,36 +724,78 @@ function setCurrentNumber(n){
     document.getElementById('questionNumber').innerText = n
 }
 
+var timeout
+var timeoutStartTime
+
+timer = document.getElementById('timer')
+
+function updateTimer(){
+    newTime = "0:" + String(Math.ceil(20 - (Date.now() - timeoutStartTime) /1000))
+    timer.innerText = newTime
+}
+
 var imgNumber
 var currentQuestion
 var incorrect = []
+
+var timerLength = 20
 
 function play(){
 
     if (currentQuestion <= 25){
 
+        timeout = setTimeout(submit, timerLength * 1000)
+        timeoutStartTime = Date.now()
+
+        interval = setInterval(updateTimer, 500)
+
         imgNumber = getRandomFromSet(imgOptions)
         setImg(imgNumber)
         setCurrentNumber(currentQuestion)
 
-        //increment seen for picture
+        addPictureSeen(uid)
+        addUserSeen(imgNumber)
         //increment seen for user
         //add picture to user's seen
+
     } else {
 
         //put results array into session storage
-        sessionStorage.setItem("incorrect", String(incorrect))
-        window.location.href = "./results.html"
+
+        userRef = root.child("users").child(uid)
+
+        user = userRef.once('value').then((snap) => {
+            values = snap.val()
+
+            userRef.child("accuracyData")
+            .set({"accuracy" : values.correctData.correctCount / values.seenData.seenCount})
+            .then(() => {
+                sessionStorage.setItem("incorrect", String(incorrect))
+                window.location.href = "./results.html"
+            })
+
+        })
+
+        // calculateAccuracy().then(() => {
+        //
+        // })
     }
 }
 
 function submit(){
+
+    clearTimeout(timeout)
+
     numberValue = document.getElementById("suggestionList").value
 
     correct = numberValue == imgNumber
 
     if(correct){
         // alert("CORRECT")
+
+        addUserCorrect(imgNumber)
+        addPictureCorrect(uid)
+
         //increment user's correct answers
         //increment correct for the picture
         //add picture to user's correct
@@ -661,7 +807,10 @@ function submit(){
 
 
     //start new round
-    document.getElementsByClassName('ui-autocomplete-input')[0].value = ""
+    input = document.getElementsByClassName('ui-autocomplete-input')[0]
+    input.value = ""
+    input.disabled = "disabled"
+    setTimeout(() => {input.disabled = "";input.focus()}, 1000)
     currentQuestion += 1
     play()
 
@@ -685,6 +834,6 @@ $(".ui-autocomplete-input").keyup(function(event){
 
 currentQuestion = 1
 
-play()
+
 
 </script>

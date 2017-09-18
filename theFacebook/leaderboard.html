@@ -27,80 +27,175 @@
     <link rel="stylesheet" href="./general.css">
 </head>
 
-<style>
-.green {
-    color: #17d402;
-}
-
-.orange {
-    color: #e9b21c;
-}
-
-.red {
-    color: #d9221c;
-}
-</style>
-
 <script>
     var names = {"4387700": "Walden Capen", "4387695": "Letitia Caspersen", "4387585": "John Ehrgott", "4387642": "Sebastian El Hadj", "4387677": "Patrick Eldredge", "4387707": "Ella Ferrucci", "4387603": "Jared Gura", "4387662": "Rami Hahami", "4387636": "Connor Hall", "4387647": "Robin Huntington", "4387703": "Andrew Johnson", "4387694": "Alexandra Kirchner", "4387579": "Amelia Lee", "4387671": "Aine Ley", "4387710": "Emily Li", "4447669": "Julia Lin", "4387689": "Phoebe Lynch", "4387667": "Caroline Messina", "4387683": "Kellen O'Donnell", "4387583": "Alesandra Powell", "4387681": "John Rogers", "4387690": "Stanley Spence", "4387675": "John Sperling", "4387697": "Maya Varkey", "4387712": "Fiorenza Viacava Vera", "4387602": "Tyler Weisberg", "4387691": "Anuj Agarwal", "3909582": "Beatrice Agbi", "4387631": "Samarth Agrawal", "4387564": "Luke Benedict", "3909594": "Jack Bolton", "4387615": "Nicolas Bowden", "4387611": "Alexander Brown", "4387699": "Tate Burgin", "4444996": "Tai Campbell", "4387566": "Yuen Ning Chang", "3909602": "Katherine Clark", "4387688": "Zoe Colloredo-Mansfeld", "3939379": "Charles Dane", "3909608": "Hudson Davis", "4387657": "Shane Dennin", "4387661": "Isaiah Desrosiers", "4387560": "Olivia Dillon", "3909611": "Ronan Doherty", "4387592": "Caroline Drapeau", "4387610": "Margaret Ferris", "4387637": "Aidan Garcia", "4387609": "Joshua Golden", "4387679": "Lilly Gordon", "3909630": "Claire Holding", "4387651": "Derek Hu", "4444995": "Andrew Huo", "4387680": "Addison Hyde", "4011146": "Jeremy Jin", "4387630": "Elena Junkala", "4387576": "Alexandra Karr", "3909641": "Kaylie Keegan", "3909642": "Lily Kempczinski", "4387686": "George Kingsland", "4387574": "Andrej Klema", "4387559": "Annabel Lee", "3909649": "Nicole Lee Heberling", "4387577": "Neve Ley", "4387581": "Hanling Liao", "3909657": "Robert Long", "4387704": "Ainsley McKeown", "4387619": "Tristan Mecenas", "3909664": "Daniel Meehan", "4387580": "Spencer Miller", "4387713": "Grace Mumford", "3909669": "Mikayla Murrin", "4387632": "Chiara Nevard", "3909672": "Obinna Nwaokoro", "4387573": "Aisling O'Connell", "3909673": "Juhyun Oh", "4387578": "Anne O'Leary", "4387600": "Roshan Palakkal", "3909676": "Jane Park", "3909677": "Zoe Park", "4387601": "Angelica Parra", "4387702": "Jack Pedreschi", "4387618": "Edwina Polynice", "4444991": "Leah Pothel", "3909684": "Cornelia Potter", "4387676": "Samuel Quigley", "4086297": "Anthony Romano", "4387606": "Nathaniel Salander", "4387653": "Aroon Sankoh", "4387563": "Katherine Sapinski", "4387698": "Eric Schiavone", "3909698": "Timothy Smith", "3909699": "Robert Stankard", "4387696": "Alexis Steinert", "4387659": "Cassidy Thibodeau", "3909705": "Russell Thorndike", "4387693": "Edith Thors", "4387685": "Wilson Thors", "4387588": "Cella Wardrop", "4387687": "Angela Wei", "4387582": "Harriet Winterer", "4387708": "Hannah Wise", "4387596": "Yizhen Wu", "4387614": "Nicholas Wyman", "4387706": "Tianzhen Zhai", "4387607": "Nathan Zhang", "4387587": "Lucas Zheng", "3909580": "Neha Agarwal", "3909584": "Afran Ali", "3909585": "Alden Alijani", "3420256": "Josephine Alling Graney", "3909586": "Douglas Altshuler", "3909587": "Brooks Anderson", "3420258": "Lucy Anderson", "3909588": "Papa Baffour-Awuah", "3909590": "Emma Kristine Beard", "3909591": "Nicklaus Beck", "3909592": "Luke Beckstein", "3420261": "Caroline Beran", "3420263": "Marc Borghi", "3937109": "Isabel Brown", "3420269": "Lwazi Bululu", "4387646": "Gilintaba Canca", "3420271": "Theodore Carlin", "3431236": "Kevin Carney", "3909600": "Cara Chang", "3909601": "Derek Chang", "3939395": "Yiwei Chen", "3420276": "Yoo Kyung Cho", "3420279": "Kevin Clark", "3420280": "Caleb Coleman", "3431880": "Mary Collins", "3909619": "Anna Copeland", "3909607": "Madison Culcasi", "3909610": "Edward Deng", "3420285": "Erin Dollard", "4387604": "John Donovan", "4387589": "Yang Du", "3909615": "Eleanor Dunn", "3448528": "Filip Engstrom", "4387669": "Hutshie Faugas", "3909616": "Ann Fey", "3909618": "Jay Fitzgerald", "3420289": "Elizabeth Girian", "3937746": "Anirudh Gogineni", "4387709": "James Goodrich", "3420293": "Lindsey Graham", "3420297": "Joshua Guo", "4387668": "Jonathan Hahami", "3976220": "Ambrey Hayes", "4387656": "Henry Hodde", "3939412": "Chioma Ilozor", "3420301": "Willow Irving", "3909636": "Garrett Johnson", "3909637": "Katherine Johnson", "4387608": "Matthew Kandel", "3909639": "Andres Kaneb", "3909640": "Aileen Kauffman", "3909643": "Annabel Kocks", "3420311": "Henry Kuck", "4387595": "Jung Won Lee", "4387569": "Jillian Leung", "3909652": "Rebeccah Lipson", "3909656": "Caroline Locke", "3909659": "Grace Mastroianni", "3909660": "Andrew Mazza", "4387665": "Eamon McNamara", "3420326": "John Michaud", "3909666": "Oscar Monarrez", "3420330": "Joshua Nam", "3420332": "Joseph O'Brien", "3932408": "Tatum Pike", "3909681": "Richa Pillai", "3420341": "Andrew Porter", "3420343": "Eliza Powers", "4387645": "James Rainey", "3909689": "Mark Reiss", "4444990": "Katherine Reveno", "3909694": "Alexander Schade", "3909695": "Finn Scott", "3909701": "Maxwell Steinert", "3420366": "Kathryn Stovall", "3909702": "Maximillian Strong", "3909703": "William Stuart", "3909706": "Gardner Thors", "3909707": "Olivia Ting", "3909709": "Powers Trigg", "3936998": "Eliza Turner", "3909711": "Charles Wahba", "3909717": "Caroline Wilcox", "3909723": "Oliver Ye", "3420387": "Benjamin Zaidel", "3257274": "Julien Alam", "3257277": "Clement Banwell", "3420265": "Tilden Brooks", "3420266": "Alison Brown", "3431790": "Katherine Brown", "3420267": "Mark Bruni", "3257280": "Andrew Burke", "3909597": "Meghan Carney", "3420273": "Lars Caspersen", "3257287": "Jaden Cheeks", "3420277": "Edward Cho", "3257290": "Hae In Chung", "3420281": "Sarah Conner", "3287365": "Sophia Conroy", "3556335": "Bridget Cornell", "3420282": "Lily Cratsley", "3257295": "Ishana Das", "3420283": "Walker Davey", "3257298": "Morayo Fernandez", "3909621": "Theodore Gardiner", "3420288": "Dawit Ghebremedhin", "3909626": "Sara Glawe", "3909627": "Jonah Gold", "3420290": "Evaline Gomila", "3420291": "Brent Gorton", "3420295": "Grant Gund", "3420296": "Llura Gund", "3420298": "Becker Han", "3431798": "Angelika Hillios", "3257309": "Gloria Hui", "3431898": "Frances Hyde", "3909633": "Yunona Iwasaki", "3257313": "Aaron Jin", "3420303": "Autumn Johnson", "4387635": "Noah Kader", "4129971": "Julia Kendall", "3420307": "Rajit Khanna", "3097192": "Jeong Hyun Kim", "3420308": "Shane Kim", "3420309": "Abigail Kirk", "3257317": "Jacob Kissell", "3420310": "Alexandra Kogler", "3420315": "Julien Lee Heberling", "3430563": "Andrew Lei", "3282755": "Shirley Li", "3420318": "Halle Livermore", "3420320": "Elizabeth Lord", "3257322": "Amy Lu", "3257321": "Marianne Lu", "3257323": "Finn Lynch", "3608158": "Vladimir Malashenko", "3420323": "Riya Malhotra", "3472880": "Faiz Malik", "3420324": "Emma Matthews", "3435272": "Seamus McAvoy", "3909663": "Leo McMahon", "3257331": "Robert Meehan", "3420331": "Kochoe Nikoi", "3420335": "Ademola Ogunsanya", "3257340": "Anders Orr", "3257342": "Sophie Park", "4388083": "Steven Perchuk", "4387654": "Nicole Pollis", "3282758": "Charlotte Pontifell", "3420345": "Sandra Redjali", "3420346": "Claire Reiss", "3420347": "Montanna Riggs", "3420349": "Dagla Rodriguez", "3420353": "Thomas Ryan", "3909691": "Francisca Saldivar", "3257355": "Karla Sanford", "3420357": "George Schiavone", "3257357": "Gabriel Scholl", "3909697": "Yichuan Shi", "4387663": "Brandon Slawaska", "3420360": "Bennett Smith", "3420361": "Maxwell Solomon", "3257359": "John Stankard", "3420364": "Nicholas Steinert", "3431978": "James Sullivan", "3420369": "Christopher Sznip", "4387655": "Ayanda Tambo", "3257361": "Feng Tian", "3420373": "Frederika Tobeason", "3420374": "Lyndsey Toce", "4387643": "William Torriani", "3420376": "Augustinius Vrattos", "3257367": "Helena Weatherly", "3420378": "John Wilmerding", "3420379": "Joseph Wilson", "3420382": "Brian Xiao", "3909722": "Andrew Yang", "3420388": "Ra'ad Zeid", "3420255": "Noah Aaron", "3257276": "George Altshuler", "3097186": "Alyna Baharozian", "3257278": "Alexa Beckstein", "3257281": "Brianna Calareso", "3909596": "Liam Calder", "3257282": "Benjamin Calmas", "3257283": "Noelia Carbajal", "3097194": "Benjamin Cardinal", "3097143": "Ryan Carr", "3257284": "Christian Carson", "3257285": "Garvel Cassamajor", "3257286": "Lucy Chatfield", "3257288": "Margaret Cheever", "3605273": "Jonathan Cheng", "3257292": "Joseph Collins", "3257293": "Anne Colloredo-Mansfeld", "3257294": "Lachlan Combs", "3257296": "Nicholas David", "3097129": "Yan Davidoff", "3257299": "Gabrielle Despres", "3097193": "Blair Donohue", "3939367": "Kai Duenez", "3257301": "Elechi Egwuekwe", "3257303": "Margaret Fey", "3257304": "Tyler Forbes", "3097171": "Margot French", "3420287": "Josie Fulton", "3097191": "Ousmane Gaye", "3257306": "Rossely Gil", "3097198": "Samuel Girian", "3257307": "Randeep Alexander Grewal", "3097159": "Daniel Herdiech", "3097158": "Mark Herdiech", "3257308": "Timothy Hoopes", "3097118": "James Hovet", "3257310": "Martha Hyde", "3257312": "Jamie Jiang", "3468642": "Angelina Joyce", "3097168": "Maximilian Klein", "3257318": "Jonathan Lamson", "3257319": "Sangah Lee", "3608174": "Macy Lipkin", "3257320": "Roselle Lovell-Smith", "3257324": "Samir Malhotra", "3257325": "Paul Malone", "3257328": "Myles Maxson", "3257329": "Joseph McCalmon", "3097172": "Layla McDermott", "3257330": "Imani McGregor", "3097131": "Lanston McKeown", "3257332": "Paul Michaud", "3131665": "Benjamin Milliken", "3257333": "Jason Montima", "3257336": "Addison Newsome", "3257337": "An Nguyen", "3097124": "Nina Norton", "3097121": "Claudia Oei", "3257339": "Jayton Oei", "3257341": "Candilla Park", "3257343": "Sunhoo Park", "3420340": "Charles Pearce", "3257344": "Andrew Pearson", "3257345": "Arabella Peters", "3257347": "Nailah-Imani Pierce", "3257348": "Olivia Potter", "3257349": "Jiayi Qiao", "3257352": "Andrew Rasetti", "3257353": "Aidan Reilly", "3257354": "Mary Sabatelle", "3257356": "Richard Santry", "3420358": "Cameron Schmitt", "3909696": "Gregory Segal", "3257358": "Charles Senko", "3097176": "Dongmin Shin", "3933859": "Thomas Steere", "3257360": "Charles Sun", "3097178": "Rohan Varkey", "3257363": "Charles Vrattos", "3257364": "Ethan Walsh", "3257366": "Alexander Waxman", "3257368": "Kevin Xiao", "3257369": "Michael Xiao", "3420383": "Eric Yang", "3097184": "Haoxuan Zhai", "3097180": "Becky Zhang"}
 </script>
 
+<script>
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+        // User is signed in.
+        var displayName = user.displayName || user.email
+        var uid = user.uid;
+
+        console.log(user)
+
+        // ...
+    } else {
+        // User is signed out.
+
+        window.location.href = "/theFacebook"
+
+    }
+});
+</script>
+
+<header>
+    <h1>Leaderboard:</h1>
+    <p>Play 3 whole rounds to get on the accuracy leaderboard</p>
+    <p><a href="/theFacebook/play.html">Play Again</a>
+</header>
+
 <body>
+    <div id="percentageDiv" class="col1">
+        <h2>Leaders by accuracy:</h2>
+        <table id="percentage">
 
-    <h1><span id="accuracy"></span> accuracy</h1>
+        </table>
+    </div>
 
-    <h2><a href="./play.html">Play Again</a></h2>
-    <h2><a href="./leaderboard.html">Leaderboard</a></h2>
+    <div id="totalDiv" class="col2">
+        <h2>Leaders by total:</h2>
+        <table id="total">
 
-    <h2>Incorrect:</h2>
-
-    <table id="incorrect">
-
-    </table>
-
+        </table>
+    </div>
 </body>
+
+<style>
+
+.col1 {
+    width: 50%;
+    position: absolute;
+    top: 140px;
+
+    padding-right: 20px;
+}
+
+.col2 {
+    width: 50%;
+    position: absolute;
+    top: 140px;
+
+    right: 0px;
+    z-index: -1;
+    padding-left: 20px;
+}
+
+</style>
 
 <script>
 
-    function getGrade(n) {
-        console.log(n)
-        if (n>0.9){
-            return "green"
-        } else if (n > 0.75) {
-            return "orange"
+    function compareTotal(a,b) {
+        if(a.correctData.correctCount > b.correctData.correctCount){
+            return -1;
         } else {
-            return "red"
+            return 1;
         }
     }
 
-    incorrect = sessionStorage.getItem("incorrect").split(',')
+    function compareAccuracy(a,b) {
+        if(a.accuracyData.accuracy > b.accuracyData.accuracy){
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 
-    accuracySpan = document.getElementById("accuracy")
-    accuracySpan.innerText = String(Math.ceil((1 - incorrect.length / 25) * 100)) + "%"
-    accuracySpan.className = getGrade(1 - incorrect.length / 25)
 
+    function populateTables(values) {
+        totalList = []
 
-    table = document.getElementById('incorrect')
+        for (var key in values) {
+            if (values.hasOwnProperty(key)) {
+                totalList.push(values[key])
+            }
+        }
+        accuracyList = totalList.slice()
 
-    for (var number of incorrect) {
-        // console.log(number)
-        // console.log(names[number])
+        totalList.sort(compareTotal)
+        accuracyList.sort(compareAccuracy)
 
-        img = document.createElement("img")
-        img.src = "./pictures/large_user_" + number + ".jpg"
-        imgTd = document.createElement("td")
-        imgTd.append(img)
+        accuracyList = accuracyList.filter((item) => {
+            return item.seenData.seenCount > 74
+        })
 
-        nameTd = document.createElement("td")
-        nameTd.innerText = names[number]
-        nameTd.className = "nameTd"
+        console.log(totalList)
+        console.log(accuracyList)
 
-        tr = document.createElement("tr")
-        tr.append(imgTd)
-        tr.append(nameTd)
+        for (item of totalList) {
+            table = document.getElementById('total')
+            number = item.userData.imgNumber
 
-        table.append(tr)
+            img = document.createElement("img")
+            img.src = "./pictures/large_user_" + number + ".jpg"
+            imgTd = document.createElement("td")
+            imgTd.append(img)
+
+            nameTd = document.createElement("td")
+            nameTd.innerText = names[number] || item.userData.email
+            nameTd.className = "nameTd"
+
+            totalTd = document.createElement("td")
+            totalTd.innerText = item.correctData.correctCount
+            totalTd.className = "totalTd"
+
+            tr = document.createElement("tr")
+            tr.append(imgTd)
+            tr.append(nameTd)
+            tr.append(totalTd)
+
+            table.append(tr)
+        }
+
+        for (item of accuracyList) {
+            table = document.getElementById('percentage')
+            number = item.userData.imgNumber
+
+            img = document.createElement("img")
+            img.src = "./pictures/large_user_" + number + ".jpg"
+            imgTd = document.createElement("td")
+            imgTd.append(img)
+
+            nameTd = document.createElement("td")
+            nameTd.innerText = names[number] || item.userData.email
+            nameTd.className = "nameTd"
+
+            accuracyTd = document.createElement("td")
+            accuracyTd.innerText = String(Math.floor(item.accuracyData.accuracy * 100)) + "%"
+            accuracyTd.className = "accuracyTd"
+
+            tr = document.createElement("tr")
+            tr.append(imgTd)
+            tr.append(nameTd)
+            tr.append(accuracyTd)
+
+            table.append(tr)
+        }
 
     }
+
+
+    db = firebase.database()
+    root = db.ref("/")
+    usersRef = root.child("users")
+
+    usersRef.once('value').then((snap) => {
+        values = snap.val()
+
+        populateTables(values)
+
+    })
+
 
 </script>
