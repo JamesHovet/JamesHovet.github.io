@@ -829,7 +829,7 @@ function submit(){
     input = document.getElementsByClassName('ui-autocomplete-input')[0]
     input.value = ""
     input.disabled = "disabled"
-    setTimeout(() => {input.disabled = "";input.focus()}, 1000)
+    setTimeout(() => {input.disabled = "";input.focus()}, 200)
     currentQuestion += 1
     play()
 
