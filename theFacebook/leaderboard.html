@@ -53,7 +53,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 <header>
     <h1>Leaderboard:</h1>
     <p>Play 3 whole rounds to get on the accuracy leaderboard</p>
-    <p><a href="/theFacebook/play.html">Play Again</a>
+    <p><a href="/theFacebook/play.html">Play Again</a> <a href="/theFacebook/">Back</a></p>
 </header>
 
 <body>
@@ -73,6 +73,11 @@ firebase.auth().onAuthStateChanged(function(user) {
 </body>
 
 <style>
+
+header {
+    align-items: center;
+    text-align: center;
+}
 
 .col1 {
     width: 50%;

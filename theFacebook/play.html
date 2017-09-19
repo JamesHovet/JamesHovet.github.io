@@ -59,6 +59,19 @@
 .ui-autocomplete-input {
     display: block;
     width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+body {
+    text-align: center;
+    align-items: center;
+}
+
+button{
+    margin-top: 5px;
+    width: 250px;
 }
 
 </style>
@@ -70,8 +83,10 @@
     </div>
 
     <div id="timerDiv">
-        <h2 id="timer">0:20</h2>
+        <h2 id="timer" style="font-size:2.5em; margin-top:20px;">0:20</h2>
     </div>
+
+    <h2>Who is this?</h2>
 
     <div id="imgDiv">
         <img id="img" src="null"/>
@@ -581,6 +596,10 @@
         </select>
 
         <button id="submitButton" onclick="submit();">SUBMIT</button>
+    </div>
+
+    <div id="instructions" style="width:300px; margin-left:auto; margin-right:auto; margin-top:30px;">
+        Type the name of the person in the photo. The box will autocomplete for you. You can also use the arrow keys to select an item from the dropdown. Press enter to submit your answer.
     </div>
 
 </body>
