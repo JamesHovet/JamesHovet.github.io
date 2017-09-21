@@ -38,7 +38,7 @@ firebase.auth().onAuthStateChanged(function(user) {
         var displayName = user.displayName || user.email
         var uid = user.uid;
 
-        console.log(user)
+        // console.log(user)
 
         // ...
     } else {
@@ -102,18 +102,22 @@ header {
 <script>
 
     function compareTotal(a,b) {
-        if(a.correctData.correctCount > b.correctData.correctCount){
-            return -1;
-        } else {
-            return 1;
+        if(a.hasOwnProperty("correctData") && b.hasOwnProperty("correctData")){
+            if(a.correctData.correctCount > b.correctData.correctCount){
+                return -1;
+            } else {
+                return 1;
+            }
         }
     }
 
     function compareAccuracy(a,b) {
-        if(a.accuracyData.accuracy > b.accuracyData.accuracy){
-            return -1;
-        } else {
-            return 1;
+        if(a.hasOwnProperty("accuracyData") && b.hasOwnProperty("accuracyData")){
+            if(a.accuracyData.accuracy > b.accuracyData.accuracy){
+                return -1;
+            } else {
+                return 1;
+            }
         }
     }
 
@@ -132,11 +136,11 @@ header {
         accuracyList.sort(compareAccuracy)
 
         accuracyList = accuracyList.filter((item) => {
-            return item.seenData.seenCount > 74
+            return item.hasOwnProperty("seenData") && item.seenData.seenCount > 74
         })
 
-        console.log(totalList)
-        console.log(accuracyList)
+        // console.log(totalList)
+        // console.log(accuracyList)
 
         for (item of totalList) {
             table = document.getElementById('total')
@@ -152,7 +156,9 @@ header {
             nameTd.className = "nameTd"
 
             totalTd = document.createElement("td")
-            totalTd.innerText = item.correctData.correctCount
+            if(item.hasOwnProperty("correctData")){
+                totalTd.innerText = item.correctData.correctCount
+            }
             totalTd.className = "totalTd"
 
             tr = document.createElement("tr")
