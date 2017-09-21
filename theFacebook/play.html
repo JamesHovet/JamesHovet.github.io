@@ -749,7 +749,7 @@ var timeoutStartTime
 timer = document.getElementById('timer')
 
 function updateTimer(){
-    newTime = "0:" + String(Math.ceil(20 - (Date.now() - timeoutStartTime) /1000))
+    newTime = "0:" + String(Math.ceil(10 - (Date.now() - timeoutStartTime) /1000))
     timer.innerText = newTime
 }
 
@@ -757,7 +757,7 @@ var imgNumber
 var currentQuestion
 var incorrect = []
 
-var timerLength = 20
+var timerLength = 10
 
 function play(){
 
