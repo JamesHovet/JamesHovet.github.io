@@ -1,0 +1,29 @@
+{
+    "links" : [
+        {"source":0,"target":5,"value":11},
+        {"source":0,"target":6,"value":1},
+        {"source":0,"target":7,"value":9},
+        {"source":1,"target":5,"value":1},
+        {"source":1,"target":6,"value":1},
+        {"source":1,"target":7,"value":6},
+        {"source":2,"target":5,"value":2},
+        {"source":2,"target":6,"value":19},
+        {"source":2,"target":7,"value":10},
+        {"source":3,"target":5,"value":1},
+        {"source":3,"target":7,"value":1},
+        {"source":4,"target":5,"value":6},
+        {"source":4,"target":6,"value":24},
+        {"source":4,"target":7,"value":53}
+    ],
+    "nodes" : [
+        {"names":"Daily"},
+        {"names":"Monthly"},
+        {"names":"Never"},
+        {"names":"Weekly"},
+        {"names":"Sickness"},
+        {"names":"No"},
+        {"names":"NoOpinion"},
+        {"names":"Yes"}
+    ]
+
+}
