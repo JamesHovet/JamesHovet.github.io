@@ -16,14 +16,15 @@
         {"source":4,"target":7,"value":53}
     ],
     "nodes" : [
-        {"names":"Daily"},
-        {"names":"Monthly"},
-        {"names":"Never"},
-        {"names":"Weekly"},
-        {"names":"Sickness"},
-        {"names":"No"},
-        {"names":"NoOpinion"},
-        {"names":"Yes"}
-    ]
+        {"name":"Daily"},
+        {"name":"Monthly"},
+        {"name":"Never"},
+        {"name":"Weekly"},
+        {"name":"Sickness"},
+        {"name":"No"},
+        {"name":"NoOpinion"},
+        {"name":"Yes"}
+    ],
+    "total" : 150
 
 }

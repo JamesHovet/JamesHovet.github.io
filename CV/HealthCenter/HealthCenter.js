@@ -12,10 +12,10 @@ var grotonColor = "#8C1217"
 var secondaryColor = "#222222"
 var opacity = 0.2
 
-//form
+var format = d3.format(".0%");
 
 function draw(selector, source, width, height){
-    var svgForm = d3.select(selector)
+    var svg = d3.select(selector)
         .attr("width", width)
         .attr("height", height)
 
@@ -24,25 +24,25 @@ function draw(selector, source, width, height){
         .nodePadding(20)
         .extent([[0 + padding, 0 + padding], [width - padding, height - padding]]);
 
-    var link = svgForm.append("g")
+    var link = svg.append("g")
         .attr("class", "links")
         .attr("fill", "none")
         .attr("stroke", secondaryColor)
         .attr("stroke-opacity", opacity)
       .selectAll("path");
 
-    var node = svgForm.append("g")
+    var node = svg.append("g")
         .attr("class", "nodes")
         .attr("font-family", "sans-serif")
         .attr("font-size", 10)
       .selectAll("g");
 
-    d3.json(source, function (error, form) {
+    d3.json(source, function (error, data) {
 
-        sankey(form)
+        sankey(data)
 
         link = link
-            .data(form.links)
+            .data(data.links)
             .enter().append("path")
             .attr("d", d3.sankeyLinkHorizontal())
             .attr("stroke-width", function(d) { return Math.max(1, d.width); })
@@ -62,7 +62,7 @@ function draw(selector, source, width, height){
             })
 
         node = node
-            .data(form.nodes)
+            .data(data.nodes)
             .enter().append("g");
 
         node.append("rect")
@@ -105,6 +105,18 @@ function draw(selector, source, width, height){
                     })
             })
 
+        d3.select(selector + " .nodes")
+            .selectAll("g")
+            .append("text")
+            .attr("x", function(d) { return d.x0 - 6; })
+            .attr("y", function(d) { return (d.y1 + d.y0) / 2; })
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "end")
+            .attr("font-family", "Georgia")
+            .text(function(d) { return d.name + " " + format(d.value / data.total); })
+            .filter(function(d) { return d.x0 < width / 2; })
+            .attr("x", function(d) { return d.x1 + 6; })
+            .attr("text-anchor", "start");
 
     })
 
