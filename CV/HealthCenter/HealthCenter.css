@@ -1,0 +1,15 @@
+body {
+  background: #fcfcfa;
+}
+
+body, svg {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+
+body svg {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
