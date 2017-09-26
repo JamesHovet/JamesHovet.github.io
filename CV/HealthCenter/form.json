@@ -32,17 +32,18 @@
         {"source":4,"target":11,"value":1}
     ],
     "nodes" : [
-        {"names":"Fifth"},
-        {"names":"Fourth"},
-        {"names":"Second"},
-        {"names":"Sixth"},
-        {"names":"Third"},
-        {"names":"New"},
-        {"names":"Returning"},
-        {"names":"Daily"},
-        {"names":"Monthly"},
-        {"names":"Never"},
-        {"names":"Sickness"},
-        {"names":"Weekly"}
-    ]
+        {"name":"Fifth"},
+        {"name":"Fourth"},
+        {"name":"Second"},
+        {"name":"Sixth"},
+        {"name":"Third"},
+        {"name":"New"},
+        {"name":"Returning"},
+        {"name":"Daily"},
+        {"name":"Monthly"},
+        {"name":"Never"},
+        {"name":"Sickness"},
+        {"name":"Weekly"}
+    ],
+    "total" : 134
 }

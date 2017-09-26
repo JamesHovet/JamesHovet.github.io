@@ -17,6 +17,6 @@
         {"name":"AllAfter"},
         {"name":"NoAfter"},
         {"name":"SomeAfter"}
-    ]
-
+    ],
+    "total" : 96
 }

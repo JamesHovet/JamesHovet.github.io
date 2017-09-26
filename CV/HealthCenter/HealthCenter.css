@@ -1,5 +1,6 @@
 body {
-  background: #fcfcfa;
+    background: #fcfcfa;
+    font-family: "Georgia";
 }
 
 body, svg {
@@ -12,4 +13,10 @@ body svg {
     margin-left: auto;
     margin-right: auto;
     display: block;
+}
+
+p.aside {
+    margin-left: 25%;
+    margin-right: 25%;
+    font-size: 1.3em;
 }
