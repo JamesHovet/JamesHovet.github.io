@@ -25,6 +25,10 @@
         {"name":"NoOpinion"},
         {"name":"Yes"}
     ],
-    "total" : 150
+    "total" : 150,
+    "questions" : {
+        "How often do you go to the HC?" : 1,
+        "Do you feel like the health center is easy to access?" : 0
+    }
 
 }
