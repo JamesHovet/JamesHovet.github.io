@@ -11,12 +11,17 @@
         {"source":2,"target":5,"value":4}
     ],
     "nodes" : [
-        {"name":"AllBefore"},
-        {"name":"NoBefore"},
-        {"name":"SomeBefore"},
-        {"name":"AllAfter"},
-        {"name":"NoAfter"},
-        {"name":"SomeAfter"}
+        {"name":"All Before"},
+        {"name":"None Before"},
+        {"name":"Some Before"},
+        {"name":"All After"},
+        {"name":"None After"},
+        {"name":"SomeA fter"}
     ],
-    "total" : 96
+    "total" : 47,
+    "questions" : {
+        "Before?" : 1,
+        "Now?" : 0
+    },
+    "title" : "Your perscription medication allowed in room?"
 }

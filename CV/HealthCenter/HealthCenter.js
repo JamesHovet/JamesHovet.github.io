@@ -6,7 +6,7 @@ width = width < 1000 ? width : 1000
 
 var height = width < 1000 ? 600 : width * 0.6
 
-var padding = 15
+var padding = 50
 
 var grotonColor = "#8C1217"
 var secondaryColor = "#222222"
@@ -14,7 +14,67 @@ var opacity = 0.2
 
 var format = d3.format(".0%");
 
+
 function draw(selector, source, width, height){
+    function getX(index, items) {
+        return ((index * 2) + 1) * (width/(items * 2))
+    }
+
+    function drawYAxis(scale, yPos, selector, tickValues=null, className="noLine"){
+        var axis = d3.axisBottom()
+            .scale(scale)
+            .tickValues(tickValues)
+
+        d3.select(selector).append("g")
+            .attr("class", "axis axis_" + className)
+            .attr("transform", "translate(" + 0 + "," + yPos + ")")
+            .call(axis)
+        return axis
+    }
+
+    function drawTitle(text, yPos, className="default"){
+        d3.select(selector).append("g")
+            .attr("class", "title title_" + className)
+            .attr("transform", "translate(" + 0 + "," + yPos + ")")
+            .append("text")
+            .attr("x", () => {return width/2})
+            .attr("y", 0)
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            .text(() => {return text})
+    }
+
+    function makeOrdinalScale(dict, max=null) {
+        // console.log(dict)
+
+        sortable = Object.keys(dict).map((key) => {
+            return [key, dict[key]]
+        })
+
+        function sortingFunction(first, second) {
+            return second[1] - first[1];
+        }
+
+        sortable.sort(sortingFunction)
+
+        sorted = sortable.map((d) => {return d[0]; })
+
+        if(max){
+            sorted = sorted.slice(0,max)
+        }
+
+        range = [...Array(sorted.length).keys()].map((index) => {
+            return getX(index, sorted.length )
+        })
+
+        scale = d3.scaleOrdinal()
+            .domain(sorted)
+            .range(range)
+            .unknown(width + 200)//get the unkowns off the screen
+
+        return scale
+    }
+
     var svg = d3.select(selector)
         .attr("width", width)
         .attr("height", height)
@@ -40,6 +100,9 @@ function draw(selector, source, width, height){
     d3.json(source, function (error, data) {
 
         sankey(data)
+
+        console.log(data)
+
 
         link = link
             .data(data.links)
@@ -72,7 +135,6 @@ function draw(selector, source, width, height){
             .attr("width", function(d) { return d.x1 - d.x0; })
             .attr("fill", grotonColor)
             .on("mouseover", function(d, i){
-                console.log(d)
 
                 sourceLinks = Array()
                 targetLinks = Array()
@@ -85,8 +147,6 @@ function draw(selector, source, width, height){
                 }
 
                 connectedLinks = sourceLinks.concat(targetLinks).map((i) => {return i.index})
-
-                console.log(connectedLinks)
 
                 d3.select(selector + " .links").selectAll("path")
                     .attr("stroke", (d, i) => {
@@ -105,6 +165,15 @@ function draw(selector, source, width, height){
                     })
             })
 
+        maxDepth = 0
+        for(node of data.nodes){
+            if(node.depth > maxDepth){
+                maxDepth = node.depth
+            }
+        }
+
+        console.log(maxDepth)
+
         d3.select(selector + " .nodes")
             .selectAll("g")
             .append("text")
@@ -113,10 +182,21 @@ function draw(selector, source, width, height){
             .attr("dy", "0.35em")
             .attr("text-anchor", "end")
             .attr("font-family", "Georgia")
-            .text(function(d) { return d.name + " " + format(d.value / data.total); })
+            .text(function(d) { return d.name + " " + format((d.value) / data.total); })
             .filter(function(d) { return d.x0 < width / 2; })
             .attr("x", function(d) { return d.x1 + 6; })
             .attr("text-anchor", "start");
+
+        // console.log(data)
+        scale = makeOrdinalScale(data.questions)
+        // console.log(svg)
+        drawYAxis(scale, height - padding*(2/3), selector)
+
+        if(data.hasOwnProperty("title")){
+            console.log(data.title)
+            drawTitle(data.title, padding/2)
+        }
+
 
     })
 
