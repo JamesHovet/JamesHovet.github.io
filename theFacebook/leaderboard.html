@@ -149,6 +149,12 @@ header {
 
         for (item of totalList) {
             table = document.getElementById('total')
+            if(!item.hasOwnProperty("userData")){
+                continue
+            }
+            if(!item.userData.hasOwnProperty("imgNumber")){
+                continue
+            }
             number = item.userData.imgNumber
 
             img = document.createElement("img")
@@ -175,6 +181,12 @@ header {
         }
 
         for (item of accuracyList) {
+            if(!item.hasOwnProperty("userData")){
+                continue
+            }
+            if(!item.userData.hasOwnProperty("imgNumber")){
+                continue
+            }
             table = document.getElementById('percentage')
             number = item.userData.imgNumber
 
