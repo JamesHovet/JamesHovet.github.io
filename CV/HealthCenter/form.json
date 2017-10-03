@@ -49,6 +49,6 @@
     "questions" : {
         "What Form are you in?" : 1,
         "Are you a returning student?" : 2,
-        "How often do you go to the HC?" : 0
+        "How often do you go to the Health Center?" : 0
     }
 }
