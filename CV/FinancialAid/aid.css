@@ -1,0 +1,73 @@
+body {
+    background: #fcfcfa;
+    font-family: "Georgia";
+}
+
+body, svg {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+
+body svg {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+p.aside {
+    margin-left: 25%;
+    margin-right: 25%;
+    font-size: 1.3em;
+}
+
+.axis_noLine {
+    stroke-width: 0px;
+}
+
+text {
+    font-size: 1.3em;
+    font-family: "Georgia"
+}
+
+.title_default text {
+    font-size: 0.4em;
+}
+/*
+table, tbody, tr {
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}*/
+
+
+
+table {
+    margin-left: 10%;
+    margin-right: 10%;
+    display: block;
+}
+
+.left {
+    margin-left: 10%;
+}
+
+.center {
+
+}
+
+.right {
+    margin-right: 10%;
+}
+
+.question {
+    text-align: center;
+    width: 70%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.answer {
+    text-align: center;
+}
