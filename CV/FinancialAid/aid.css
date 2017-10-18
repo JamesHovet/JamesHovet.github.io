@@ -71,3 +71,9 @@ table {
 .answer {
     text-align: center;
 }
+
+#headerTable tbody {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

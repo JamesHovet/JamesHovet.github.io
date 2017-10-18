@@ -1,10 +1,10 @@
 var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
 
-width = width < 1000
+docWidth = width < 1000
     ? width
     : 1000
 
-var height = width < 1000
+var docHeight = width < 1000
     ? 600
     : width * 0.6
 
@@ -19,9 +19,9 @@ number = d3.select("#SVG_number")
     // .attr("class", "left")
 
 numberGrid = new Grid(number, "#SVG_number")
-    .width(300)
-    .height(300)
-    .rows(20)
+    .width(docWidth * 0.8)
+    .height(docHeight * 0.5)
+    .rows(10)
     .cols(20)
     .max(100)
     .padding(1)
@@ -73,7 +73,7 @@ grantGridDay = new Grid(grantDay, "#SVG_grantDay")
     .padding(1)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
-            d3.select("#grantBoardersDay")
+            d3.select("#grantDayAnswer")
                 .html(d3.format(",")(my.unit * (index + 1)))
             }
         // console.log("from callback ", my.max, my.total)
@@ -83,8 +83,26 @@ grantGridDay = new Grid(grantDay, "#SVG_grantDay")
 
 grantGridDay.call()
 
+numberFull = d3.select("#SVG_numberFull")
 
+numberFullGrid = new Grid(numberFull, "#SVG_numberFull")
+    .width(300)
+    .height(300)
+    .rows(20)
+    .cols(20)
+    .max(400)
+    .padding(1)
+    .mouseover(function(datum, index, selection, my) {
+        if(my.active){
+            d3.select("#numberFullAnswer")
+                .html(d3.format(",")(my.unit * (index + 1)))
+            }
+        // console.log("from callback ", my.max, my.total)
+        // console.log("amount ", my.unit * (index + 1))
 
+    })
+
+numberFullGrid.call()
 
 
 
