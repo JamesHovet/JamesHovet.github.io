@@ -11,7 +11,7 @@ function Grid(selection, id) {
         padding = 2
         fillColor = "#AEAEAE"
         highlightColor = "#8C1217"
-        activeColor = "#222222"
+        activeColor = "#A74E53"
         active = true
         mouseover = function(d, i, selection) {
             return
@@ -38,16 +38,25 @@ function Grid(selection, id) {
         my.total = my.rows * my.cols
         my.unit = my.max / my.total
         squareDim = height/rows < width/cols ? height/rows : width/cols
+
+        offsetX = (width - (my.cols * squareDim))/2
+        offsetY = (height - (my.rows * squareDim))/2
+
         values = []
 
         my.mouseover = mouseover
         my.mouseout = mouseout
         my.click = click
 
+        // console.log(rows, my.rows)
+        // console.log(cols, my.cols)
+        // // console.log(total, my.total)
+        // console.log(my.total)
+
         for (var i = 0; i < my.total; i++) {
             values.push({
-                "x" : i % rows * squareDim,
-                "y" : Math.floor(i/rows) * squareDim,
+                "x" : (i % my.cols * squareDim) + offsetX,
+                "y" : (Math.floor(i/my.cols) * squareDim) + offsetY,
                 "i" : i
             })
         }
