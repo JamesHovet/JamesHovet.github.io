@@ -33,17 +33,14 @@ text {
 .title_default text {
     font-size: 0.4em;
 }
-/*
-table, tbody, tr {
-    text-align: center;
-    display: block;
+
+body {
+    max-width: 1100px;
     margin-left: auto;
     margin-right: auto;
-}*/
+}
 
-
-
-table {
+table, #number {
     margin-left: 10%;
     margin-right: 10%;
     display: block;
@@ -68,7 +65,7 @@ table {
     margin-left: auto;
 }
 
-.answer {
+.guess {
     text-align: center;
 }
 
@@ -76,4 +73,29 @@ table {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+.dropCap {
+    float: left;
+    font-size: 3.6em;
+    padding-right: 8px;
+    color: #8C1217;
+}
+
+#intro {
+    width: 70%;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.answer {
+    display: block !important;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.2em;
+    width: 70%;
 }
