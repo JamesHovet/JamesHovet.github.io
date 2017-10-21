@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
 <head>
     <link href="/CV/CV.css" rel="stylesheet" type="text/css">
     <link href="./aid.css" rel="stylesheet" type="text/css">
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-      ga('create', 'UA-104919018-1', 'auto');
-      ga('send', 'pageview');
-
+        ga('create', 'UA-104919018-1', 'auto');
+        ga('send', 'pageview');
     </script>
 </head>
+
 <body>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-scale.v1.min.js"></script>
@@ -28,26 +36,38 @@
         <p class="dateline">TBD, 2017</p>
     </header>
 
-    <div id="number">
-
-                    <svg id="SVG_number"></svg>
-                    <h2 class="question">What percentage of students are on financial aid?</h2>
-                    <h1 class="answer"><span id="numberAnswer">0</span>%</h3>
-
+    <div id="intro">
+        <p><span class="dropCap">W</span>e talk a lot about financial aid at Groton, but how much does the school actually spend on it? How many students are on finanical aid? And what do the incomes of those on financial aid look like?</p>
+        <!-- </br> -->
+        <p>Guess an Guess to each question by hovering over the diagram and clicking which box you think represents the accurate Guess. Click again to change your Guess. Check your Guesss and see how well you did at the end of the page.</p>
+        <br>
     </div>
+
+    <div id="number">
+        <table>
+            <svg id="SVG_number"></svg>
+            <h2 class="question">What percentage of students are on some financial aid?</h2>
+            <h1 class="guess"><span id="numberGuess">0</span>%</h3>
+
+        </table>
+    </div>
+    <p id="numberAnswer" class="answer" style="display: none;">
+        The real figure is about 38%. In 2017, that amounted to 145 students out of the current 381.
+    </p>
     <div id="grantBoarders">
         <table>
-            <tr>
-                <td>
-                    <h2 class="question">What is the average amount of financial aid given to boarders?</h2>
-                    <h1 class="answer"><span id="grantBoardersAnswer">0</span>$</h3>
-                </td>
-                <td>
-                    <svg id="SVG_grantBoarders"></svg>
-                </td>
+            <td>
+                <h2 class="question">What is the average amount of financial aid given to boarders?</h2>
+                <h1 class="guess"><span id="grantBoardersGuess">0</span>$</h1>
+            </td>
+            <td>
+                <svg id="SVG_grantBoarders"></svg>
             </td>
         </table>
     </div>
+    <p id="grantBoardersAnswer" class="answer" style="display: none;">
+        The average grant for boarding students is $46,490, or about 80% of full tuition.
+    </p>
     <div id="grantDay">
         <table>
             <tr>
@@ -56,24 +76,31 @@
                 </td>
                 <td>
                     <h2 class="question">What is the average amount of financial aid given to Day Students?</h2>
-                    <h1 class="answer"><span id="grantDayAnswer">0</span>$</h3>
+                    <h1 class="guess"><span id="grantDayGuess">0</span>$</h1>
                 </td>
-            </td>
+
         </table>
     </div>
+    <p id="grantDayAnswer" class="answer" style="display: none;">
+        The real figure is $31,355, or about 70% of full tuition for day students.
+    </p>
     <div id="numberFull">
         <table>
             <tr>
                 <td>
-                    <h2 class="question">How many students receive the highest level of financial aid (pay fewer than $5,000 a year in tuition?) </h2>
-                    <h1 class="answer"><span id="numberFullAnswer">0</span></h3>
+                    <h2 class="question">How many students receive the highest level of financial aid (pay fewer than $5,000 a year in tuition)? </h2>
+                    <h1 class="guess"><span id="numberFullGuess">0</span></h1>
+
                 </td>
                 <td>
                     <svg id="SVG_numberFull"></svg>
                 </td>
-            </td>
+
         </table>
     </div>
+    <p id="numberFullAnswer" class="answer" style="display: none;">
+        In 2017, there were 66 students who recieved the highest level of financial aid. All families that reported incomes of less than $80,000 were given this level of aid. 
+    </p>
 
 </body>
 

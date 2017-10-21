@@ -27,7 +27,7 @@ numberGrid = new Grid(number, "#SVG_number")
     .padding(1)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
-            d3.select("#numberAnswer")
+            d3.select("#numberGuess")
                 .html((my.unit * (index + 1)))
             }
         // console.log("from callback ", my.max, my.total)
@@ -52,7 +52,7 @@ grantGridBoarders = new Grid(grantBoarders, "#SVG_grantBoarders")
     .padding(1)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
-            d3.select("#grantBoardersAnswer")
+            d3.select("#grantBoardersGuess")
                 .html(d3.format(",")(my.unit * (index + 1)))
             }
         // console.log("from callback ", my.max, my.total)
@@ -73,7 +73,7 @@ grantGridDay = new Grid(grantDay, "#SVG_grantDay")
     .padding(1)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
-            d3.select("#grantDayAnswer")
+            d3.select("#grantDayGuess")
                 .html(d3.format(",")(my.unit * (index + 1)))
             }
         // console.log("from callback ", my.max, my.total)
@@ -94,7 +94,7 @@ numberFullGrid = new Grid(numberFull, "#SVG_numberFull")
     .padding(1)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
-            d3.select("#numberFullAnswer")
+            d3.select("#numberFullGuess")
                 .html(d3.format(",")(my.unit * (index + 1)))
             }
         // console.log("from callback ", my.max, my.total)
