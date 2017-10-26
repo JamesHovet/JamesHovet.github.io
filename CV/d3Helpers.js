@@ -11,8 +11,10 @@ function Grid(selection, id) {
         padding = 2
         fillColor = "#AEAEAE"
         highlightColor = "#8C1217"
-        activeColor = "#A74E53"
+        activeColor = "#A7888A"
+        guessColor = "#8A6365"
         active = true
+        guess = 0
         mouseover = function(d, i, selection) {
             return
         }
@@ -75,6 +77,7 @@ function Grid(selection, id) {
                 .attr("fill", fillColor)
                 .on("mouseover", function(datum, index) {
                     if(my.active){
+                        my.guess = index
                         d3.select(id)
                             .selectAll("rect")
                             .attr("fill", (d, i) => {
@@ -98,6 +101,7 @@ function Grid(selection, id) {
                     // console.log("in primary callback: ", this.active)
                     // console.log("in primary callback my: ", my.active)
                     if(my.active){
+                        my.guess = index
                         my.active = false
                         d3.select(id)
                             .selectAll("rect")
@@ -112,8 +116,46 @@ function Grid(selection, id) {
                         my.active = true
                     }
                     my.click(datum, index, g, my)
+
                 }.bind(this))
 
+    }
+
+    my.selectIndex = function(index){
+        guess = my.guess
+        my.active = false
+
+        if(guess < index){
+            d3.select(id)
+                .selectAll("rect")
+                .attr("fill", (d, i) => {
+                    if(i < index) {
+                        if(i <= guess){
+                            return guessColor
+                        } else {
+                            return highlightColor
+                        }
+                    } else {
+                        return fillColor
+                    }
+                })
+        } else {
+            d3.select(id)
+                .selectAll("rect")
+                .attr("fill", (d, i) => {
+                    if(i < guess) {
+                        if(i <= index){
+                            return highlightColor
+                        } else {
+                            return guessColor
+                        }
+                    } else {
+                        return fillColor
+                    }
+                })
+        }
+
+        window.scrollTo(0,0)
     }
 
     my.width = function(value) {
@@ -218,6 +260,13 @@ function Grid(selection, id) {
         if(!arguments.length)
             return active
         active = value
+        return my
+    }
+
+    my.guess = function(value) {
+        if(!arguments.length)
+            return guess
+        guess = value
         return my
     }
 
