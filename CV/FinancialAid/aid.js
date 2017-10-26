@@ -1,3 +1,9 @@
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    alert("This interactive is not optimized for mobile. Please use a device with a mouse and keyboard for the best experience.")
+}
+
+
+
 var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
 
 docWidth = width < 1000
