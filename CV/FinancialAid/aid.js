@@ -24,7 +24,7 @@ numberGrid = new Grid(number, "#SVG_number")
     .rows(10)
     .cols(20)
     .max(100)
-    .padding(1)
+    .padding(0.5)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
             d3.select("#numberGuess")
@@ -49,7 +49,7 @@ grantGridBoarders = new Grid(grantBoarders, "#SVG_grantBoarders")
     .rows(20)
     .cols(20)
     .max(56000)
-    .padding(1)
+    .padding(0.5)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
             d3.select("#grantBoardersGuess")
@@ -70,7 +70,7 @@ grantGridDay = new Grid(grantDay, "#SVG_grantDay")
     .rows(20)
     .cols(20)
     .max(56000)
-    .padding(1)
+    .padding(0.5)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
             d3.select("#grantDayGuess")
@@ -91,7 +91,7 @@ numberFullGrid = new Grid(numberFull, "#SVG_numberFull")
     .rows(20)
     .cols(20)
     .max(400)
-    .padding(1)
+    .padding(0.5)
     .mouseover(function(datum, index, selection, my) {
         if(my.active){
             d3.select("#numberFullGuess")
@@ -104,20 +104,29 @@ numberFullGrid = new Grid(numberFull, "#SVG_numberFull")
 
 numberFullGrid.call()
 
+answers = {
+    numberGrid: 38,
+    grantGridBoarders: 46490,
+    grantGridDay: 31355,
+    numberFullGrid: 66
+}
+function showAnswers(){
+    for (var key in answers) {
+        if (answers.hasOwnProperty(key)) {
+            // console.log(answers[key])
+            grid = window[key]
+            // console.log(grid.max)
+            i = Math.floor((grid.total/grid.max) * answers[key])
+            // console.log(i)
+            // console.log(grid.id)
+            grid.selectIndex(i)
+        }
+    }
 
-
-
-
-//
-// g2 = new grid(d3.select("#two"), "#two")
-//     .mouseover(function(datum, index, selection, my) {
-//         console.log("g2")
-//         console.log("from callback ", my.max, my.total)
-//         console.log("amount ", my.unit * (index + 1))
-//
-//     })
-//     .click(function(datum, index, selection, my) {
-//         console.log("g2 click", datum, index, selection)
-//     })
-//
-// g2.call()
+    d3.selectAll(".answer")
+        .attr("style", "display: block;")
+    d3.selectAll(".answerNumber")
+        .attr("style", "display: block;")
+    d3.selectAll(".guess")
+        .attr("style", "display: none;")
+}
