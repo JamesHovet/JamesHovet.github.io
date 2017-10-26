@@ -33,13 +33,13 @@
 
         <h1 class="title">By The Numbers: Finacial Aid</h1>
         <p class="byline"><a href="/">By James Hovet</a></p>
-        <p class="dateline">TBD, 2017</p>
+        <p class="dateline">October 27, 2017</p>
     </header>
 
     <div id="intro">
         <p><span class="dropCap">W</span>e talk a lot about financial aid at Groton, but how much does the school actually spend on it? How many students are on finanical aid? And what do the incomes of those on financial aid look like?</p>
         <!-- </br> -->
-        <p>Guess an Guess to each question by hovering over the diagram and clicking which box you think represents the accurate Guess. Click again to change your Guess. Check your Guesss and see how well you did at the end of the page.</p>
+        <p>Make a guess to each question by hovering over the diagram and clicking which box you think represents the accurate guess. Click again to change your guess. Check your guess and see how well you did at the end of the page.</p>
         <br>
     </div>
 
@@ -47,7 +47,8 @@
         <table>
             <svg id="SVG_number"></svg>
             <h2 class="question">What percentage of students are on some financial aid?</h2>
-            <h1 class="guess"><span id="numberGuess">0</span>%</h3>
+            <h1 class="guess"><span id="numberGuess">0</span>%</h1>
+            <h1 class="answerNumber" style="display: none;"><span id="numberAnswer">38</span>%</h1>
 
         </table>
     </div>
@@ -57,8 +58,9 @@
     <div id="grantBoarders">
         <table>
             <td>
-                <h2 class="question">What is the average amount of financial aid given to boarders?</h2>
+                <h2 class="question">What is the average size of the grant given to boarders?</h2>
                 <h1 class="guess"><span id="grantBoardersGuess">0</span>$</h1>
+                <h1 class="answerNumber" style="display: none;"><span id="grantBoardersAnswer">46,490</span>$</h1>
             </td>
             <td>
                 <svg id="SVG_grantBoarders"></svg>
@@ -75,8 +77,9 @@
                     <svg id="SVG_grantDay"></svg>
                 </td>
                 <td>
-                    <h2 class="question">What is the average amount of financial aid given to Day Students?</h2>
+                    <h2 class="question">What is the average size of the grant given to day students?</h2>
                     <h1 class="guess"><span id="grantDayGuess">0</span>$</h1>
+                    <h1 class="answerNumber" style="display: none;"><span id="grantDayAnswer">31,355</span>$</h1>
                 </td>
 
         </table>
@@ -90,6 +93,7 @@
                 <td>
                     <h2 class="question">How many students receive the highest level of financial aid (pay fewer than $5,000 a year in tuition)? </h2>
                     <h1 class="guess"><span id="numberFullGuess">0</span></h1>
+                    <h1 class="answerNumber" style="display: none;"><span id="numberFullGuess">66</span></h1>
 
                 </td>
                 <td>
@@ -99,9 +103,11 @@
         </table>
     </div>
     <p id="numberFullAnswer" class="answer" style="display: none;">
-        In 2017, there were 66 students who recieved the highest level of financial aid. All families that reported incomes of less than $80,000 were given this level of aid. 
+        In 2017, there were 66 students who recieved the highest level of financial aid. All families that reported incomes of less than $80,000 were given this level of aid.
     </p>
-
+    <div class="answerButton">
+        <a onclick="showAnswers()">Check My Answers</a>
+    </div>
 </body>
 
 <script src="aid.js"></script>
