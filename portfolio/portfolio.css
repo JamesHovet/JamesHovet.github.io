@@ -26,6 +26,15 @@ body {
 .name {
     font-size: 6em;
     margin-bottom: 20px;
+
+    text-decoration: none;
+    color: white;
+
+    font-weight: bold;
+}
+
+.name:hover {
+    color: #D2D2D2;
 }
 
 table.half {
