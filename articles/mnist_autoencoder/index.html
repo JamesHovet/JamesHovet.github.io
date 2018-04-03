@@ -1,0 +1,46 @@
+<html>
+
+<head>
+    <title>A Map of the MNIST Space</title>
+    <link href="/articles/articles.css" type="text/css" rel="stylesheet">
+    <link href="./index.css" type="text/css" rel="stylesheet">
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-104919018-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+</head>
+
+<body>
+    <article>
+        <h1 class="title">A Map of the MNIST Space</h1>
+        <h2 class="smallTitle">A Visual Introduction to a Simple Autoencoder</h2>
+        <h3 class="byline">By James Hovet</h3>
+        <img src="./map.png"/>
+        <aside>
+            This article assumes basic farmiliarity with neural networks and Tensorflow. Such a backgroud can be found <a href="https://www.tensorflow.org/get_started/mnist/beginners">here</a>
+        <p>
+            At its core, the job of an autoencoder is to take some high-dimensional data and find the most eficcent way to map it into a lower dimensional space. It takes a complex representation of something (in our case a handwriten number) and finds a simpler representation (in our case a 2D vector.)
+        </p>
+        <p>
+            That is all that the image above is, an illustration of how an autoencoder I trained mapped the MNIST dataset into two dimensional space. Each image is a point sampled from the one-by-one 2D space into which the computer mapped the images.
+        </p>
+        <h2>Autoencoders vs. Classifiers</h2>
+        <p>
+            The job of a vanilla neural network is to take some high-dimensional data (an image, a set of characteristics about a house) and classifiy it into one of a given number of classes. The error that the network is miminizing is the difference between how it classified the data and the true classification of the data.
+        </p>
+        <p>
+            An autoencoder, on the other hand, takes some high-dimensional data and then tries to accurately compress the data into a simpler representation (called the latent representation) and then de-compress that data into the origianl input. The error that the network is minimizing is the difference between the input data and the recreated data.
+        </p>
+        <img src="./diagram1.png"/>
+        <p>
+            In our network, the input is an image (flattened into a 784-dimensional vector). The network encodes the data into a 2D vector, and then reconstructs it back into an image.
+        </p>
+
+    </article>
+</body>
