@@ -1,0 +1,87 @@
+
+body {
+    font-family: "Georgia";
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+p {
+    font-size: 1.2em;
+}
+
+p, h1, h2, h3, h4, text, div  {
+    color: #222;
+}
+
+a {
+    color: #891516;
+    text-decoration: none;
+}
+
+header img {
+    height: 60px;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-top: 0px;
+}
+
+.title {
+    font-style: italic;
+    text-align: center;
+    font-size: 3em;
+
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.byline {
+    text-align: center;
+    font-size: 1.4em;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.byline a {
+    text-decoration: none;
+    color: #222;
+}
+
+.byline a:hover {
+    color: #891516;
+}
+
+.dateline {
+    text-align: center;
+    font-size: 0.9em;
+    font-style: italic;
+    margin-top: 0px;
+    color: #555555;
+}
+
+.smallTitle {
+    font-style: italic;
+    text-align: center;
+    font-size: 2em;
+}
+
+.smallHeader {
+    text-align: center;
+    font-style: italic;
+    font-size: 2.1em;
+
+    margin-top: 10px;
+}
+
+footer {
+    margin-top: 200px;
+}
