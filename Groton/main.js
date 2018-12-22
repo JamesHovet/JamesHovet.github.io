@@ -8,6 +8,16 @@ var yearRange = [1880,2030]
 
 var eventYPos = height * (7/8);
 
+var background = svg.append("g")
+    .attr("id", "background")
+    .attr("transform-origin", "bottom left")
+
+d3.xml("background.svg").then((document) => {
+    background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
+    d3.select("#overallRoot")
+        .attr("transform", "translate(-500, 0)")
+})
+
 var root = svg.append("g")
     .attr("id", "root")
 
@@ -56,7 +66,7 @@ var timelineDates = timelineParents
 
 // ZOOM
 var zoom = d3.zoom()
-    .scaleExtent([1 / 2, 4])
+    .scaleExtent([7/8, 4])
     .translateExtent([[0-100,0],[width + 100,0]])
     .on("zoom", zoomed)
 
@@ -70,6 +80,7 @@ function zoomed() {
     timelineParents.attr("transform", function(d) {
         return "translate(" + transform.applyX(timescale(d)) + ", " + eventYPos + ")";
     })
+    background.attr("transform", "translate(" + transform.x + ",0) scale(" + transform.k + ")")
 }
 
 function eventClickHandler(){
@@ -86,8 +97,8 @@ function translateTo(x,y){
     zoom.translateTo(svg, x,y);
 }
 
-function smoothTranslateTo(x,y){
-    svg.transition().duration(750).call(zoom.translateTo, x, y);
+function smoothTranslateTo(x,y, time){
+    svg.transition().duration(time).call(zoom.translateTo, x, y);
 }
 
 //Helpers
