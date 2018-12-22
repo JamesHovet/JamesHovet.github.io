@@ -4,15 +4,17 @@ var svg = d3.select("svg"),
 
 var debugArea = d3.select("body").append("div").append("p");
 
+//Position and size constants
 var dateShift = 30
+var notchHeight = 15
+var eventYPos = height * (7/8);
+var dotRadius = 5;
 
 var yearRange = [1880,2030]
 
-var eventYPos = height * (7/8);
-
 var background = svg.append("g")
     .attr("id", "background")
-    .attr("transform-origin", "bottom left")
+
 
 d3.xml("background.svg").then((document) => {
     background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
@@ -28,27 +30,6 @@ var timescale = d3.scaleLinear()
     .domain(yearRange)
 
 // CONTENT
-var events = root.append("g")
-    .attr("id", "events")
-
-var eventParents = events.selectAll("g")
-    .data(dataJson)
-    .enter()
-        .append("g")
-        .attr("transform", (d) => {return "translate(" + timescale(d.year) + ", " + eventYPos + ")";})
-
-var circles = eventParents
-    .append("circle")
-    .attr("r", 4)
-    .classed("eventDot", true)
-    .on("click", eventClickHandler)
-
-var debugText = eventParents
-    .append("text")
-    .text((d) => {return Math.round(timescale(d.year))})
-    .classed("debugText", true)
-
-
 var yearIncrements = getIncrements(yearRange);
 
 var timeline = root.append("g")
@@ -60,11 +41,39 @@ var timelineParents = timeline.selectAll("g")
         .append("g")
         .attr("transform", (d) => {return "translate(" + timescale(d) + "," + eventYPos + ")";})
 
+var timelineNotches = timelineParents
+    .append("line")
+    .attr("x1", 0).attr("y1", -notchHeight/2)
+    .attr("x2", 0).attr("y2", notchHeight/2)
+    .classed("timelineNotches", true)
+
 var timelineDates = timelineParents
     .append("text")
     .text((d) => {return d;})
     .attr("transform", "translate(0," + dateShift + ")")
-    .classed("timelineDates")
+    .attr("text-anchor", "middle")
+    .classed("timelineDates", true)
+
+var events = root.append("g")
+    .attr("id", "events")
+
+var eventParents = events.selectAll("g")
+    .data(dataJson)
+    .enter()
+        .append("g")
+        .attr("transform", (d) => {return "translate(" + timescale(d.year) + ", " + eventYPos + ")";})
+
+var circles = eventParents
+    .append("circle")
+    .attr("r", dotRadius)
+    .classed("eventDot", true)
+    .on("click", eventClickHandler)
+
+var debugText = eventParents
+    .append("text")
+    .text((d) => {return Math.round(timescale(d.year))})
+    .classed("debugText", true)
+
 
 // ZOOM
 var zoom = d3.zoom()
@@ -76,13 +85,17 @@ svg.call(zoom);
 
 function zoomed() {
     var transform = d3.event.transform;
+    var k = transform.k;
+    var cy = 500;
     eventParents.attr("transform", function(d) {
         return "translate(" + transform.applyX(timescale(d.year)) + ", " + eventYPos + ")";
     });
     timelineParents.attr("transform", function(d) {
         return "translate(" + transform.applyX(timescale(d)) + ", " + eventYPos + ")";
     })
-    background.attr("transform", "translate(" + transform.x + ",0) scale(" + transform.k + ")")
+    // background.attr("transform", "translate(" + transform.x + ",0) scale(" + transform.k + ")")
+    background.attr("transform", "matrix(" + k + ",0,0," + k + "," + transform.x + "," +  (cy - (k*cy)) + ")");
+
 }
 
 function eventClickHandler(){
