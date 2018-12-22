@@ -2,6 +2,8 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
+var debugArea = d3.select("body").append("div").append("p");
+
 var dateShift = 30
 
 var yearRange = [1880,2030]
@@ -85,6 +87,7 @@ function zoomed() {
 
 function eventClickHandler(){
     console.log(d3.event.target.__data__)
+    debugArea.text(d3.event.target.__data__.body)
 }
 
 //Actions
