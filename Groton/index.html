@@ -6,11 +6,21 @@
     }
 
     #background {
-        fill: lightgrey;
+        /* fill: #ECECEC; */
+        fill: whitesmoke;
     }
 
     .debugText {
         display: none;
+    }
+
+    .timelineNotches {
+        stroke: darkgrey;
+        stroke-width: 1px;
+    }
+
+    .timelineDates {
+        font-family: "Palatino", serif;
     }
 
     .eventDot {
@@ -19,7 +29,7 @@
     }
 </style>
 <body>
-    <svg width="960" height="500" id="root"></svg>
+    <svg width="900" height="500" id="root"></svg>
 </body>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="data.js"></script>
