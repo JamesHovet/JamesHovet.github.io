@@ -105,6 +105,6 @@ var dataJson = [
 	},
 	{
 		"year": 2018,
-		"body": "Architectural Digest named Groton School’s Circle the most beautiful independent school campus in Massachusetts. Designed by landscape architect Frederick Law Olmsted (Central Park, Boston Public Garden), the Circle today looks largely as it did one hundred years ago."
+		"body": "<em>Architectural Digest</em> named Groton School’s Circle the most beautiful independent school campus in Massachusetts. Designed by landscape architect Frederick Law Olmsted (Central Park, Boston Public Garden), the Circle today looks largely as it did one hundred years ago."
 	}
 ]

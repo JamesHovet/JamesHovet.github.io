@@ -2,7 +2,7 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var debugArea = d3.select("body").append("div").append("p");
+var debugArea = d3.select("body").append("div").append("p")
 
 //Position and size constants
 const DATE_Y_SHIFT = 30
@@ -10,6 +10,8 @@ const NOTCH_HEIGHT = 15
 const EVENT_Y_POS = height * (7/8);
 const DOT_RADIUS = 5;
 const FOCUS_ZOOM = 3;
+const FOCUS_TIME = 1000; //in ms
+const PARALLAX_FACTOR = 0.05;
 
 var yearRange = [1880,2030]
 
@@ -29,6 +31,21 @@ var root = svg.append("g")
 var timescale = d3.scaleLinear()
     .range([0, width])
     .domain(yearRange)
+
+// POP UP
+
+var popup = d3.select("svg")
+    .append("foreignObject")
+    .attr("x",0).attr("y",0).attr("width",400).attr("height",200).attr("class","node")
+var popupDiv = popup
+    .append("body")
+    .attr("xmlns", "http://www.w3.org/1999/xhtml")
+    .append("div")
+    .attr("id", "popup")
+    .attr("class", "popup")
+    .style("opacity", 1);
+
+popupDiv.append("p").text("HELLO");
 
 // CONTENT
 var yearIncrements = getIncrements(yearRange);
@@ -95,9 +112,11 @@ function zoomed() {
         return "translate(" + transform.applyX(timescale(d)) + ", " + EVENT_Y_POS + ")";
     })
     // background.attr("transform", "translate(" + transform.x + ",0) scale(" + transform.k + ")")
-    background.attr("transform", "matrix(" + k + ",0,0," + k + "," + transform.x + "," +  (cy - (k*cy)) + ")");
+    background.attr("transform", "matrix(" + k + ",0,0," + k + "," + (transform.x * (1 + PARALLAX_FACTOR)) + "," +  (cy - (k*cy)) + ")");
 
 }
+
+//CLICK (Focus + pop up)
 
 function eventClickHandler(){
     var target = d3.event.target;
@@ -105,29 +124,29 @@ function eventClickHandler(){
     console.log(d3.event.target.__data__)
     debugArea.text(d3.event.target.__data__.body)
 
-    focus(timescale(data.year), FOCUS_ZOOM);
+    focus(timescale(data.year), FOCUS_ZOOM, FOCUS_TIME);
+
+    popup
+        .style("opacity", 1)
+        .html(data.body)
+        .style("left", timescale(data.year) + "px");
 }
 
 //Actions
-
 function resetZoom(){
     svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
-}
-
-function translateTo(x,y){
-    zoom.translateTo(svg, x,y);
 }
 
 function smoothTranslateTo(x,y, time){
     svg.transition().duration(time).call(zoom.translateTo, x, y);
 }
 
-function focus(x,k){
+function focus(x,k,time){
     var zoomTo = d3.zoomIdentity
         .translate(width/2 - (x*k),0)
         .scale(k)
 
-    svg.transition().duration(750).call(zoom.transform, zoomTo);
+    svg.transition().duration(time).call(zoom.transform, zoomTo);
 }
 
 //Helpers
