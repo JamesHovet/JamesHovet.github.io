@@ -2,22 +2,35 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var debugArea = d3.select("body").append("div").append("p")
-
 //Position and size constants
-const DATE_Y_SHIFT = 30
-const NOTCH_HEIGHT = 15
+const DATE_Y_SHIFT = 30;
+const NOTCH_HEIGHT = 15;
 const EVENT_Y_POS = height * (7/8);
+const BODY_Y_POS = height * (1/8);
 const DOT_RADIUS = 5;
+const SELECTED_DOT_RADIUS = 7;
 const FOCUS_ZOOM = 3;
 const FOCUS_TIME = 1000; //in ms
 const PARALLAX_FACTOR = 0.05;
+const YEAR_RANGE = [1880,2030];
+const POPUP_WIDTH = 400;
+const POPUP_HEIGHT = 200;
 
-var yearRange = [1880,2030]
+// Data Variables //////////////////////////////////////////////////////////////////////////////////
+var currentData = {"year":0}
+var currentTarget;
+
+// SETUP ///////////////////////////////////////////////////////////////////////////////////////////
+var offClickTarget = svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("x", 0)
+    .attr("y", 0)
+    .on("click", offClickHandler)
+    .attr("fill", "white")
 
 var background = svg.append("g")
     .attr("id", "background")
-
 
 d3.xml("background.svg").then((document) => {
     background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
@@ -30,25 +43,26 @@ var root = svg.append("g")
 
 var timescale = d3.scaleLinear()
     .range([0, width])
-    .domain(yearRange)
+    .domain(YEAR_RANGE)
 
-// POP UP
 
-var popup = d3.select("svg")
+// POP UP //////////////////////////////////////////////////////////////////////////////////////////
+var popupG = d3.select("svg")
+    .append("g")
+    .attr("id", "popupG")
+
+var popup = popupG
     .append("foreignObject")
-    .attr("x",0).attr("y",0).attr("width",400).attr("height",200).attr("class","node")
-var popupDiv = popup
-    .append("body")
-    .attr("xmlns", "http://www.w3.org/1999/xhtml")
-    .append("div")
+    .attr("x",-POPUP_WIDTH/2)
+    .attr("y",0)
+    .attr("width",POPUP_WIDTH)
+    .attr("height",POPUP_HEIGHT)
+    .attr("class","node")
     .attr("id", "popup")
-    .attr("class", "popup")
-    .style("opacity", 1);
 
-popupDiv.append("p").text("HELLO");
 
-// CONTENT
-var yearIncrements = getIncrements(yearRange);
+// CONTENT /////////////////////////////////////////////////////////////////////////////////////////
+var yearIncrements = getIncrements(YEAR_RANGE);
 
 var timeline = root.append("g")
     .attr("id", "timeline")
@@ -93,7 +107,7 @@ var debugText = eventParents
     .classed("debugText", true)
 
 
-// ZOOM
+// ZOOM ////////////////////////////////////////////////////////////////////////////////////////////
 var zoom = d3.zoom()
     .scaleExtent([7/8, 4])
     .translateExtent([[0-100,0],[width + 100,0]])
@@ -114,25 +128,40 @@ function zoomed() {
     // background.attr("transform", "translate(" + transform.x + ",0) scale(" + transform.k + ")")
     background.attr("transform", "matrix(" + k + ",0,0," + k + "," + (transform.x * (1 + PARALLAX_FACTOR)) + "," +  (cy - (k*cy)) + ")");
 
+    popupG
+        .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
+
 }
 
-//CLICK (Focus + pop up)
-
+// HANDLERS ////////////////////////////////////////////////////////////////////////////////////////
 function eventClickHandler(){
-    var target = d3.event.target;
-    var data = target.__data__;
-    console.log(d3.event.target.__data__)
-    debugArea.text(d3.event.target.__data__.body)
+    if(currentTarget != null){
+        offClickHandler()
+    }
 
-    focus(timescale(data.year), FOCUS_ZOOM, FOCUS_TIME);
+    var transform = d3.zoomTransform(svg);
+    currentTarget = d3.event.target;
+    currentData = d3.event.target.__data__;
 
+    focus(timescale(currentData.year), FOCUS_ZOOM, FOCUS_TIME);
     popup
         .style("opacity", 1)
-        .html(data.body)
-        .style("left", timescale(data.year) + "px");
+        .html(currentData.body)
+    popupG
+        .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
+
+    currentTarget.setAttribute("class", "selectedEvent");
+    currentTarget.setAttribute("r", SELECTED_DOT_RADIUS);
 }
 
-//Actions
+function offClickHandler(){
+    popup
+        .style("opacity", 0);
+    currentTarget.setAttribute("class", "eventDot");
+    currentTarget.setAttribute("r", DOT_RADIUS)
+}
+
+// ACTIONS /////////////////////////////////////////////////////////////////////////////////////////
 function resetZoom(){
     svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
 }
@@ -149,7 +178,7 @@ function focus(x,k,time){
     svg.transition().duration(time).call(zoom.transform, zoomTo);
 }
 
-//Helpers
+// HELPERS /////////////////////////////////////////////////////////////////////////////////////////
 function getIncrements(range) {
     var lower = range[0];
     var upper = range[1];
