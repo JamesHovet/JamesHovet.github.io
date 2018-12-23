@@ -13,8 +13,12 @@ const FOCUS_ZOOM = 3;
 const FOCUS_TIME = 1000; //in ms
 const PARALLAX_FACTOR = 0.05;
 const YEAR_RANGE = [1880,2030];
+const PADDING = 50;
 const POPUP_WIDTH = 400;
 const POPUP_HEIGHT = 200;
+const BACKGROUND_OFFSET = 550;
+const SVG_WIDTH = 2000;
+const SVG_HEIGHT = 500;
 
 // Data Variables //////////////////////////////////////////////////////////////////////////////////
 var currentData = {"year":0}
@@ -34,15 +38,20 @@ var background = svg.append("g")
 
 d3.xml("background.svg").then((document) => {
     background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
+
+    var k = width/SVG_WIDTH;
+    var cy = height - SVG_HEIGHT * k;
+
     d3.select("#overallRoot")
-        .attr("transform", "translate(-500, 0)")
+        .attr("transform", "matrix(" + k + ",0,0," + k + ",0," +  (cy) + ")");
+
 })
 
 var root = svg.append("g")
     .attr("id", "root")
 
 var timescale = d3.scaleLinear()
-    .range([0, width])
+    .range([PADDING, width-PADDING])
     .domain(YEAR_RANGE)
 
 
@@ -118,7 +127,7 @@ svg.call(zoom);
 function zoomed() {
     var transform = d3.event.transform;
     var k = transform.k;
-    var cy = 500;
+    var cy = height;
     eventParents.attr("transform", function(d) {
         return "translate(" + transform.applyX(timescale(d.year)) + ", " + EVENT_Y_POS + ")";
     });
@@ -130,6 +139,8 @@ function zoomed() {
 
     popupG
         .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
+
+    console.log(transform)
 
 }
 
@@ -182,6 +193,6 @@ function focus(x,k,time){
 function getIncrements(range) {
     var lower = range[0];
     var upper = range[1];
-    var increments = (upper - lower)/10
+    var increments = (upper - lower)/10 + 1;
     return [...Array(increments).keys()].map((d) => {return lower + d * 10;})
 }
