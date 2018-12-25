@@ -1,3 +1,5 @@
+//TODO: Make targets bigger
+
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
@@ -20,9 +22,16 @@ const BACKGROUND_OFFSET = 550;
 const SVG_WIDTH = 2000;
 const SVG_HEIGHT = 500;
 
-// Data Variables //////////////////////////////////////////////////////////////////////////////////
-var currentData = {"year":0}
+// PRE-PROCESSING //////////////////////////////////////////////////////////////////////////////////
+
+for (var i = 0; i < dataJson.length; i++) {
+    dataJson[i]["index"] = i;
+}
+
+// DATA VARIABLES //////////////////////////////////////////////////////////////////////////////////
+var currentData = dataJson[0]
 var currentTarget;
+var currentIndex = 0;
 
 // SETUP ///////////////////////////////////////////////////////////////////////////////////////////
 var offClickTarget = svg.append("rect")
@@ -146,13 +155,16 @@ function zoomed() {
 
 // HANDLERS ////////////////////////////////////////////////////////////////////////////////////////
 function eventClickHandler(){
+
     if(currentTarget != null){
         offClickHandler()
     }
 
-    var transform = d3.zoomTransform(svg);
     currentTarget = d3.event.target;
     currentData = d3.event.target.__data__;
+    currentIndex = currentData["index"];
+
+    var transform = d3.zoomTransform(svg);
 
     focus(timescale(currentData.year), FOCUS_ZOOM, FOCUS_TIME);
     popup
