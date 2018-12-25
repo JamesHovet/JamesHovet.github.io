@@ -30,7 +30,7 @@ var dataJson = [
 	},
 	{
 		"year": 1931,
-		"body": "When FDR was governor of New York, he delivered Groton’s Prize Day speech. LINK"
+		"body": "When FDR was governor of New York, he delivered Groton’s <a href='https://issuu.com/grotonschool/docs/quarterly-fall-2017' target='_blank' >Prize Day speech.</a> "
 	},
 	{
 		"year": 1933,

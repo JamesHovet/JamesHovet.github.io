@@ -1,4 +1,5 @@
 //TODO: Make targets bigger
+//TODO: Make left/right arrows in SVG, not in text (fucking safari...)
 
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
