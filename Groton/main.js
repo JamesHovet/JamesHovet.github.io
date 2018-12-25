@@ -30,10 +30,12 @@ for (var i = 0; i < dataJson.length; i++) {
 
 // DATA VARIABLES //////////////////////////////////////////////////////////////////////////////////
 var currentData = dataJson[0]
-var currentTarget;
 var currentIndex = 0;
+var isFocused = false;
 
 // SETUP ///////////////////////////////////////////////////////////////////////////////////////////
+d3.select("body").on("keydown", keyHandler)
+
 var offClickTarget = svg.append("rect")
     .attr("width", width)
     .attr("height", height)
@@ -44,6 +46,7 @@ var offClickTarget = svg.append("rect")
 
 var background = svg.append("g")
     .attr("id", "background")
+    .on("click", offClickHandler)
 
 d3.xml("background.svg").then((document) => {
     background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
@@ -149,42 +152,74 @@ function zoomed() {
     popupG
         .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
 
-    console.log(transform)
+    // console.log(transform)
 
 }
 
 // HANDLERS ////////////////////////////////////////////////////////////////////////////////////////
 function eventClickHandler(){
+    unfocus();
 
-    if(currentTarget != null){
-        offClickHandler()
-    }
-
-    currentTarget = d3.event.target;
     currentData = d3.event.target.__data__;
     currentIndex = currentData["index"];
 
-    var transform = d3.zoomTransform(svg);
+    focusOnIndex(currentIndex);
+}
 
-    focus(timescale(currentData.year), FOCUS_ZOOM, FOCUS_TIME);
+function offClickHandler(){
+    unfocus()
+}
+
+function keyHandler(){
+    var keyCode = d3.event.keyCode;
+
+    if(isFocused){
+        if(keyCode == 37){ //LEFT ARROW
+            if(currentIndex > 0){
+                focusOnIndex(currentIndex -1);
+            }
+        } else if (keyCode == 39) { //RIGHT ARROW
+            if(currentIndex < dataJson.length - 1){
+                focusOnIndex(currentIndex  + 1);
+            }
+        }
+    }
+
+}
+
+// ACTIONS /////////////////////////////////////////////////////////////////////////////////////////
+function focusOnIndex(index){
+    unfocus()
+    isFocused = true;
+
+    currentData = dataJson[index];
+    currentIndex = index;
+
+    var transform = d3.zoomTransform(svg);
+    focusZoom(timescale(currentData.year), FOCUS_ZOOM, FOCUS_TIME);
+
     popup
         .style("opacity", 1)
         .html(currentData.body)
     popupG
         .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
 
-    currentTarget.setAttribute("class", "selectedEvent");
-    currentTarget.setAttribute("r", SELECTED_DOT_RADIUS);
+    var selectedEvent = selectAtIndex(circles, index);
+    selectedEvent.classed("selectedEvent", true);
+    selectedEvent.attr("r", SELECTED_DOT_RADIUS)
+
 }
 
-function offClickHandler(){
-    popup
-        .style("opacity", 0);
-    currentTarget.setAttribute("class", "eventDot");
-    currentTarget.setAttribute("r", DOT_RADIUS)
+function unfocus(){
+    isFocused = false;
+
+    circles.classed("selectedEvent", false);
+    circles.classed("eventDot", true);
+    circles.attr("r", DOT_RADIUS);
+
+    popup.style("opacity", 0);
 }
 
-// ACTIONS /////////////////////////////////////////////////////////////////////////////////////////
 function resetZoom(){
     svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
 }
@@ -193,7 +228,7 @@ function smoothTranslateTo(x,y, time){
     svg.transition().duration(time).call(zoom.translateTo, x, y);
 }
 
-function focus(x,k,time){
+function focusZoom(x,k,time){
     var zoomTo = d3.zoomIdentity
         .translate(width/2 - (x*k),0)
         .scale(k)
@@ -207,4 +242,10 @@ function getIncrements(range) {
     var upper = range[1];
     var increments = (upper - lower)/10 + 1;
     return [...Array(increments).keys()].map((d) => {return lower + d * 10;})
+}
+
+function selectAtIndex(selection, index){
+    return selection.filter(function (d, i) {
+        return i == index
+    })
 }
