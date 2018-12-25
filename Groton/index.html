@@ -25,7 +25,7 @@
 
     .eventDot {
         fill: #8C1217;
-    }
+    }gi
 
     .selectedEvent {
         fill: #8C1217;
@@ -39,16 +39,17 @@
     }
 
     .reverse {
-        -moz-transform: scale(-1, 1);
-        -webkit-transform: scale(-1, 1);
-        -o-transform: scale(-1, 1);
-        -ms-transform: scale(-1, 1);
-        transform: scale(-1, 1);
+        -webkit-transform: rotate(-180deg);
+        -webkit-transform-origin: center center;
+        -moz-transform: rotate(-180deg);
+        transform: rotate(-180deg);
 
         display: inline-block;
     }
 
     .arrow {
+        width: 20px;
+
         background: none;
         color: darkgrey;
         border: none;
