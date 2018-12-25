@@ -175,17 +175,27 @@ function keyHandler(){
 
     if(isFocused){
         if(keyCode == 37){ //LEFT ARROW
-            if(currentIndex > 0){
-                focusOnIndex(currentIndex -1);
-            }
+            leftArrowHandler();
         } else if (keyCode == 39) { //RIGHT ARROW
-            if(currentIndex < dataJson.length - 1){
-                focusOnIndex(currentIndex  + 1);
-            }
+            rightArrowHandler();
         }
     }
 
 }
+
+function leftArrowHandler(){
+    console.log("left")
+    if(currentIndex > 0){
+        focusOnIndex(currentIndex -1);
+    }
+}
+
+function rightArrowHandler(){
+    if(currentIndex < dataJson.length - 1){
+        focusOnIndex(currentIndex  + 1);
+    }
+}
+
 
 // ACTIONS /////////////////////////////////////////////////////////////////////////////////////////
 function focusOnIndex(index){
@@ -200,7 +210,7 @@ function focusOnIndex(index){
 
     popup
         .style("opacity", 1)
-        .html(currentData.body)
+        .html(formatHTML(currentData));
     popupG
         .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
 
@@ -248,4 +258,14 @@ function selectAtIndex(selection, index){
     return selection.filter(function (d, i) {
         return i == index
     })
+}
+
+function formatHTML(data){
+    out = "<div class='popupDiv'>" + data.body + "</div>"
+    if(data.hasOwnProperty("img")){
+        out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg'><img src='" + data.img + "'/></td></table>"
+    }
+
+    out += "<button class='reverse arrow' onclick='leftArrowHandler()'>&#x27A4;</button>  <button onclick='rightArrowHandler()' class='arrow'>&#x27A4;</button>"
+    return out;
 }

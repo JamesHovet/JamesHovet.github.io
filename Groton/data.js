@@ -1,7 +1,8 @@
 var dataJson = [
 	{
 		"year": 1884,
-		"body": "Endicott Peabody founded Groton School."
+		"body": "Endicott Peabody founded Groton School.",
+		"img": "https://jameshovet.github.io/images/Groton.jpg"
 	},
 	{
 		"year": 1899,
