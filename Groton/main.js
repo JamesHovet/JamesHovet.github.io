@@ -12,6 +12,7 @@ const EVENT_Y_POS = height * (7/8);
 const BODY_Y_POS = height * (1/8);
 const DOT_RADIUS = 5;
 const SELECTED_DOT_RADIUS = 7;
+const DOT_CLICK_RADIUS = 8;
 const FOCUS_ZOOM = 3;
 const FOCUS_TIME = 1000; //in ms
 const PARALLAX_FACTOR = 0.05;
@@ -117,11 +118,18 @@ var eventParents = events.selectAll("g")
         .append("g")
         .attr("transform", (d) => {return "translate(" + timescale(d.year) + ", " + EVENT_Y_POS + ")";})
 
+var circleClickTargets = eventParents
+    .append("circle")
+    .attr("r", DOT_CLICK_RADIUS)
+    .classed("circleClickTarget", true)
+    .on("click", eventClickHandler)
+
 var circles = eventParents
     .append("circle")
     .attr("r", DOT_RADIUS)
     .classed("eventDot", true)
     .on("click", eventClickHandler)
+
 
 var debugText = eventParents
     .append("text")
