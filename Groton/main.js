@@ -1,4 +1,3 @@
-//TODO: Make targets bigger
 //TODO: Make left/right arrows in SVG, not in text (fucking safari...)
 
 var svg = d3.select("svg"),
@@ -12,7 +11,9 @@ const EVENT_Y_POS = height * (7/8);
 const BODY_Y_POS = height * (1/8);
 const DOT_RADIUS = 5;
 const SELECTED_DOT_RADIUS = 7;
-const DOT_CLICK_RADIUS = 8;
+const DOT_CLICK_RADIUS = 9;
+const SIMULATION_TICKS = 40;
+const SIMULATION_DOT_RADIUS = 3;
 const FOCUS_ZOOM = 3;
 const FOCUS_TIME = 1000; //in ms
 const PARALLAX_FACTOR = 0.05;
@@ -83,6 +84,21 @@ var popup = popupG
     .attr("class","node")
     .attr("id", "popup")
 
+// SIMULATION //////////////////////////////////////////////////////////////////////////////////////
+
+var intitalEventSimulationNodes = dataJson.map((d) => {
+    d["x"] = timescale(d.year) + 0.01 * d["index"]; // cheat: add a little bit of a push to the initial starting positions of all the nodes so that order is maintained after the simulation
+    d["y"] = EVENT_Y_POS;
+    d["fy"] = EVENT_Y_POS;
+    return d;
+})
+
+var sim = d3.forceSimulation(intitalEventSimulationNodes)
+    .force("x", d3.forceX(function(d) { return timescale(d.year); }).strength(0.1))
+    .force("collision", d3.forceCollide(SIMULATION_DOT_RADIUS).strength(2))
+    .stop()
+
+for (var i = 0; i < SIMULATION_TICKS; i++) {sim.tick();}
 
 // CONTENT /////////////////////////////////////////////////////////////////////////////////////////
 var yearIncrements = getIncrements(YEAR_RANGE);
@@ -109,14 +125,15 @@ var timelineDates = timelineParents
     .attr("text-anchor", "middle")
     .classed("timelineDates", true)
 
+
 var events = root.append("g")
     .attr("id", "events")
 
 var eventParents = events.selectAll("g")
-    .data(dataJson)
+    .data(sim.nodes())
     .enter()
         .append("g")
-        .attr("transform", (d) => {return "translate(" + timescale(d.year) + ", " + EVENT_Y_POS + ")";})
+        .attr("transform", (d) => {return "translate(" + d.x + ", " + EVENT_Y_POS + ")";})
 
 var circleClickTargets = eventParents
     .append("circle")
@@ -150,7 +167,7 @@ function zoomed() {
     var k = transform.k;
     var cy = height;
     eventParents.attr("transform", function(d) {
-        return "translate(" + transform.applyX(timescale(d.year)) + ", " + EVENT_Y_POS + ")";
+        return "translate(" + transform.applyX(d.x) + ", " + EVENT_Y_POS + ")";
     });
     timelineParents.attr("transform", function(d) {
         return "translate(" + transform.applyX(timescale(d)) + ", " + EVENT_Y_POS + ")";
