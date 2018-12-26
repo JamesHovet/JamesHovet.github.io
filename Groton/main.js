@@ -287,11 +287,11 @@ function selectAtIndex(selection, index){
 }
 
 function formatHTML(data){
-    out = "<div class='popupDiv'>" + data.body + "</div>"
+    out = data.body
     if(data.hasOwnProperty("img")){
         out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg'><img src='" + data.img + "'/></td></table>"
     }
 
-    out += "<button class='reverse arrow' onclick='leftArrowHandler()'>&#x27A4;</button>  <button onclick='rightArrowHandler()' class='arrow'>&#x27A4;</button>"
+    out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + "</h1>" + out + "<br><button class='reverse arrow' onclick='leftArrowHandler()'>&#x27A4;</button><button onclick='rightArrowHandler()' class='arrow'>&#x27A4;</button>" + "</div>"
     return out;
 }
