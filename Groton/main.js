@@ -1,33 +1,6 @@
-//TODO: Make left/right arrows in SVG, not in text (fucking safari...)
-
-var svg = d3.select("svg")
-
-if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-    alert("MOBILE");
-    var w = document.documentElement.clientWidth;
-    var h = document.documentElement.clientHeight;
-
-    if(w > h){
-        svg.attr("width", w);
-        svg.attr("height", h);
-    } else {
-        svg.attr("width", h);
-        svg.attr("height", w);
-    }
-
-}
-
-var width = +svg.attr("width");
-var height = +svg.attr("height");
-
 //Position and size constants
 const DATE_Y_SHIFT = 30;
 const NOTCH_HEIGHT = 15;
-const EVENT_Y_POS = height * (7/8);
-const BODY_Y_POS = height * (1/8);
-const DOT_RADIUS = 5;
-const SELECTED_DOT_RADIUS = 7;
-const DOT_CLICK_RADIUS = 9;
 const SIMULATION_TICKS = 40;
 const SIMULATION_DOT_RADIUS = 3;
 const FOCUS_ZOOM = 3;
@@ -40,6 +13,39 @@ const POPUP_HEIGHT = 200;
 const BACKGROUND_OFFSET = 550;
 const SVG_WIDTH = 2000;
 const SVG_HEIGHT = 500;
+
+var DOT_RADIUS = 5;
+var SELECTED_DOT_RADIUS = 7;
+var DOT_CLICK_RADIUS = 9;
+
+//TODO: Make left/right arrows in SVG, not in text (fucking safari...)
+var svg = d3.select("svg")
+
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    alert("MOBILE");
+    var ratio = window.devicePixelRatio
+    var w = document.documentElement.clientWidth;
+    var h = document.documentElement.clientHeight;
+
+    if(w > h){
+        svg.attr("width", w);
+        svg.attr("height", h);
+    } else {
+        svg.attr("width", h);
+        svg.attr("height", w);
+    }
+
+    DOT_RADIUS *= 1.5;
+    SELECTED_DOT_RADIUS *= 1.5;
+    DOT_CLICK_RADIUS *= 1.5;
+
+}
+
+var width = +svg.attr("width");
+var height = +svg.attr("height");
+
+const EVENT_Y_POS = height * (7/8);
+const BODY_Y_POS = height * (1/8);
 
 // PRE-PROCESSING //////////////////////////////////////////////////////////////////////////////////
 
