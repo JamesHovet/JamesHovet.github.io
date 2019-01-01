@@ -4,8 +4,8 @@ var svg = d3.select("svg")
 
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
     alert("MOBILE");
-    var w = window.innerWidth;
-    var h = window.innerHeight;
+    var w = document.documentElement.clientWidth;
+    var h = document.documentElement.clientHeight;
 
     if(w > h){
         svg.attr("width", w);
