@@ -1,8 +1,24 @@
 //TODO: Make left/right arrows in SVG, not in text (fucking safari...)
 
-var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+var svg = d3.select("svg")
+
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    alert("MOBILE");
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+
+    if(w > h){
+        svg.attr("width", w);
+        svg.attr("height", h);
+    } else {
+        svg.attr("width", h);
+        svg.attr("height", w);
+    }
+
+}
+
+var width = +svg.attr("width");
+var height = +svg.attr("height");
 
 //Position and size constants
 const DATE_Y_SHIFT = 30;
