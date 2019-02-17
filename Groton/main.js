@@ -9,7 +9,7 @@ const PARALLAX_FACTOR = 0.05;
 const YEAR_RANGE = [1880,2030];
 const PADDING = 50;
 const POPUP_WIDTH = 400;
-const POPUP_HEIGHT = 200;
+const POPUP_HEIGHT = 400;
 const BACKGROUND_OFFSET = 550;
 const SVG_WIDTH = 2000;
 const SVG_HEIGHT = 500;
@@ -18,7 +18,6 @@ var DOT_RADIUS = 5;
 var SELECTED_DOT_RADIUS = 7;
 var DOT_CLICK_RADIUS = 9;
 
-//TODO: Make left/right arrows in SVG, not in text (fucking safari...)
 var svg = d3.select("svg")
 
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -84,14 +83,6 @@ d3.xml("background.svg").then((document) => {
 
 })
 
-var root = svg.append("g")
-    .attr("id", "root")
-
-var timescale = d3.scaleLinear()
-    .range([PADDING, width-PADDING])
-    .domain(YEAR_RANGE)
-
-
 // POP UP //////////////////////////////////////////////////////////////////////////////////////////
 var popupG = d3.select("svg")
     .append("g")
@@ -105,6 +96,15 @@ var popup = popupG
     .attr("height",POPUP_HEIGHT)
     .attr("class","node")
     .attr("id", "popup")
+
+    // SETUP TIMELINE ROOT /////////////////////////////////////////////////////////////////////////////
+
+    var root = svg.append("g")
+        .attr("id", "root")
+
+    var timescale = d3.scaleLinear()
+        .range([PADDING, width-PADDING])
+        .domain(YEAR_RANGE)
 
 // SIMULATION //////////////////////////////////////////////////////////////////////////////////////
 
@@ -314,6 +314,11 @@ function formatHTML(data){
         out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg'><img src='" + data.img + "'/></td></table>"
     }
 
-    out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + "</h1>" + out + "<br><button class='reverse arrow' onclick='leftArrowHandler()'>&#x27A4;</button><button onclick='rightArrowHandler()' class='arrow'>&#x27A4;</button>" + "</div>"
+    arrows = "  <svg viewBox='0 0 32 32' width='30' height='30' onclick='leftArrowHandler()' class='arrow'><polygon  scale='.5' points='32,0 23.349,16 32,32 0,16 '/></svg>  <svg viewBox='0 0 32 32' width='30' height='30' onclick='rightArrowHandler()' class='arrow'><polygon points='0,32 8.651,16 0,0 32,16 '/></svg>"
+
+
+    out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + arrows + "</h1>" + out + "<br>" + "</div>"
+
+    // out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + "<button class='arrow' onclick='leftArrowHandler()'>&#x25c5;</button><button onclick='rightArrowHandler()' class='arrow'>&#x25bb;</button></h1>" + out + "<br>" + "</div>"
     return out;
 }
