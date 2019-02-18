@@ -14,43 +14,62 @@ const BACKGROUND_OFFSET = 550;
 const BACKGROUND_SVG_WIDTH = 2000;
 const BACKGROUND_SVG_HEIGHT = 500;
 
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT07Dq-7PcVOBl4x_lc6G7_wNK6sUgFIiQYZ082JTpRi1kTcJzspmwqVvXRiHEOJioDXl_igTos9LiS/pub?gid=0&single=true&output=csv"
+
+var dataJson = []
+
 var DOT_RADIUS = 5;
 var SELECTED_DOT_RADIUS = 7;
 var DOT_CLICK_RADIUS = 9;
 
+// SIZING //////////////////////////////////////////////////////////////////////////////////////////
+
 var svg = d3.select("svg")
+if(window.frameElement == null){
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        alert("MOBILE");
+        var ratio = window.devicePixelRatio
+        var w = document.documentElement.clientWidth;
+        var h = document.documentElement.clientHeight;
 
-if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-    alert("MOBILE");
-    var ratio = window.devicePixelRatio
-    var w = document.documentElement.clientWidth;
-    var h = document.documentElement.clientHeight;
+        if(w > h){
+            svg.attr("width", w);
+            svg.attr("height", h);
+        } else {
+            svg.attr("width", h);
+            svg.attr("height", w);
+        }
 
-    if(w > h){
-        svg.attr("width", w);
-        svg.attr("height", h);
-    } else {
-        svg.attr("width", h);
-        svg.attr("height", w);
+        DOT_RADIUS *= 1.5;
+        SELECTED_DOT_RADIUS *= 1.5;
+        DOT_CLICK_RADIUS *= 1.5;
+
     }
+} else { // We are in an iframe
+    svg.attr("width", window.frameElement.offsetWidth);
+    svg.attr("height", window.frameElement.offsetHeight);
 
-    DOT_RADIUS *= 1.5;
-    SELECTED_DOT_RADIUS *= 1.5;
-    DOT_CLICK_RADIUS *= 1.5;
+    console.log("frame")
+    console.log(window.frameElement)
+
+    window.onresize = function(e){
+        console.log('resize from inside');
+        console.log(e);
+        console.log(window.frameElement.offsetWidth);
+
+        handleResize(window.frameElement.offsetWidth, window.frameElement.offsetHeight);
+
+    }
 
 }
 
 var width = +svg.attr("width");
 var height = +svg.attr("height");
 
+var priorWidth = width;
+
 const EVENT_Y_POS = height * (7/8);
 const BODY_Y_POS = height * (1/8);
-
-// PRE-PROCESSING //////////////////////////////////////////////////////////////////////////////////
-
-for (var i = 0; i < dataJson.length; i++) {
-    dataJson[i]["index"] = i;
-}
 
 // DATA VARIABLES //////////////////////////////////////////////////////////////////////////////////
 var currentData = dataJson[0]
@@ -99,30 +118,77 @@ var popup = popupG
 
 // SETUP TIMELINE ROOT /////////////////////////////////////////////////////////////////////////////
 
-    var root = svg.append("g")
-        .attr("id", "root")
+var root = svg.append("g")
+    .attr("id", "root")
 
-    var timescale = d3.scaleLinear()
-        .range([PADDING, width-PADDING])
-        .domain(YEAR_RANGE)
+var timescale = d3.scaleLinear()
+    .range([PADDING, width-PADDING])
+    .domain(YEAR_RANGE)
 
-// SIMULATION //////////////////////////////////////////////////////////////////////////////////////
+// EVENTS AND DATA FETCH ///////////////////////////////////////////////////////////////////////////
 
-var intitalEventSimulationNodes = dataJson.map((d) => {
-    d["x"] = timescale(d.year) + 0.01 * d["index"]; // cheat: add a little bit of a push to the initial starting positions of all the nodes so that order is maintained after the simulation
-    d["y"] = EVENT_Y_POS;
-    d["fy"] = EVENT_Y_POS;
-    return d;
-})
+var sim = d3.forceSimulation([])
 
-var sim = d3.forceSimulation(intitalEventSimulationNodes)
-    .force("x", d3.forceX(function(d) { return timescale(d.year); }).strength(0.1))
-    .force("collision", d3.forceCollide(SIMULATION_DOT_RADIUS).strength(2))
-    .stop()
+var events = root.append("g")
+    .attr("id", "events")
 
-for (var i = 0; i < SIMULATION_TICKS; i++) {sim.tick();}
+var eventsG = events.selectAll("g")
 
-// CONTENT /////////////////////////////////////////////////////////////////////////////////////////
+var eventParents
+var circleClickTargets;
+var circles;
+var debugText;
+
+d3.csv(CSV_URL, function(d, i){
+    return {
+        index: i,
+        year : +d.year,
+        body : d.body,
+        img : d.img,
+        x : timescale(d.year) + 0.01 * i, // cheat: add a little bit of a push to the initial starting positions of all the nodes so that order is maintained after the simulation
+        y : EVENT_Y_POS,
+        fy : EVENT_Y_POS
+    };
+}).then(function(data) {
+
+    dataJson = data;
+    currentData = data[0]
+    currentIndex = 0;
+    sFocused = false;
+
+    sim.nodes(data)
+        .force("x", d3.forceX(function(d) { return timescale(d.year); }).strength(0.1))
+        .force("collision", d3.forceCollide(SIMULATION_DOT_RADIUS).strength(2))
+        .stop()
+
+    for (var i = 0; i < SIMULATION_TICKS; i++) {sim.tick();}
+
+    eventParents = eventsG
+        .data(sim.nodes())
+        .enter()
+            .append("g")
+            .attr("transform", (d) => {return "translate(" + d.x + ", " + EVENT_Y_POS + ")";})
+
+    circleClickTargets = eventParents
+        .append("circle")
+            .attr("r", DOT_CLICK_RADIUS)
+            .classed("circleClickTarget", true)
+            .on("click", eventClickHandler)
+
+    circles = eventParents
+        .append("circle")
+            .attr("r", DOT_RADIUS)
+            .classed("eventDot", true)
+            .on("click", eventClickHandler)
+
+    debugText = eventParents
+        .append("text")
+        .text((d) => {return Math.round(timescale(d.year))})
+        .classed("debugText", true)
+
+});
+
+// INCREMENTS //////////////////////////////////////////////////////////////////////////////////////
 var yearIncrements = getIncrements(YEAR_RANGE);
 
 var timeline = root.append("g")
@@ -146,35 +212,6 @@ var timelineDates = timelineParents
     .attr("transform", "translate(0," + DATE_Y_SHIFT + ")")
     .attr("text-anchor", "middle")
     .classed("timelineDates", true)
-
-
-var events = root.append("g")
-    .attr("id", "events")
-
-var eventParents = events.selectAll("g")
-    .data(sim.nodes())
-    .enter()
-        .append("g")
-        .attr("transform", (d) => {return "translate(" + d.x + ", " + EVENT_Y_POS + ")";})
-
-var circleClickTargets = eventParents
-    .append("circle")
-    .attr("r", DOT_CLICK_RADIUS)
-    .classed("circleClickTarget", true)
-    .on("click", eventClickHandler)
-
-var circles = eventParents
-    .append("circle")
-    .attr("r", DOT_RADIUS)
-    .classed("eventDot", true)
-    .on("click", eventClickHandler)
-
-
-var debugText = eventParents
-    .append("text")
-    .text((d) => {return Math.round(timescale(d.year))})
-    .classed("debugText", true)
-
 
 // ZOOM ////////////////////////////////////////////////////////////////////////////////////////////
 var zoom = d3.zoom()
@@ -200,7 +237,6 @@ function zoomed() {
     popupG
         .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
 
-    // console.log(transform)
 
 }
 
@@ -319,6 +355,33 @@ function formatHTML(data){
 
     out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + arrows + "</h1>" + out + "<br>" + "</div>"
 
-    // out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + "<button class='arrow' onclick='leftArrowHandler()'>&#x25c5;</button><button onclick='rightArrowHandler()' class='arrow'>&#x25bb;</button></h1>" + out + "<br>" + "</div>"
     return out;
+}
+
+function handleResize(new_width, new_height){
+
+    svg.attr("width", new_width)
+
+    offClickTarget.attr("width", new_width);
+
+    var k = new_width/BACKGROUND_SVG_WIDTH;
+    var cy = new_height - BACKGROUND_SVG_HEIGHT * k;
+
+    d3.select("#overallRoot")
+        .attr("transform", "matrix(" + k + ",0,0," + k + ",0," +  (cy) + ")");
+
+    timescale.range([PADDING, new_width-PADDING]);
+
+    if (Math.abs(new_width - priorWidth) > 50){
+        priorWidth = new_width
+        sim.nodes().forEach((d) => {
+            d.x = timescale(d.year);
+        });
+        sim.force("x", d3.forceX(function(d) { return timescale(d.year); }).strength(0.1))
+        for (var i = 0; i < SIMULATION_TICKS; i++) {sim.tick();}
+    }
+
+    zoom.translateExtent([[0-100,0],[new_width + 100,0]]);
+
+    width = new_width;
 }
