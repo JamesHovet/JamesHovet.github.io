@@ -11,8 +11,8 @@ const PADDING = 50;
 const POPUP_WIDTH = 400;
 const POPUP_HEIGHT = 400;
 const BACKGROUND_OFFSET = 550;
-const SVG_WIDTH = 2000;
-const SVG_HEIGHT = 500;
+const BACKGROUND_SVG_WIDTH = 2000;
+const BACKGROUND_SVG_HEIGHT = 500;
 
 var DOT_RADIUS = 5;
 var SELECTED_DOT_RADIUS = 7;
@@ -75,8 +75,8 @@ var background = svg.append("g")
 d3.xml("background.svg").then((document) => {
     background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
 
-    var k = width/SVG_WIDTH;
-    var cy = height - SVG_HEIGHT * k;
+    var k = width/BACKGROUND_SVG_WIDTH;
+    var cy = height - BACKGROUND_SVG_HEIGHT * k;
 
     d3.select("#overallRoot")
         .attr("transform", "matrix(" + k + ",0,0," + k + ",0," +  (cy) + ")");
@@ -97,7 +97,7 @@ var popup = popupG
     .attr("class","node")
     .attr("id", "popup")
 
-    // SETUP TIMELINE ROOT /////////////////////////////////////////////////////////////////////////////
+// SETUP TIMELINE ROOT /////////////////////////////////////////////////////////////////////////////
 
     var root = svg.append("g")
         .attr("id", "root")
