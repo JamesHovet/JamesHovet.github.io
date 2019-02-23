@@ -1,18 +1,24 @@
 //Position and size constants
-const DATE_Y_SHIFT = 30;
+const DATE_Y_SHIFT = 25;
 const NOTCH_HEIGHT = 15;
 const SIMULATION_TICKS = 40;
 const SIMULATION_DOT_RADIUS = 3;
-const FOCUS_ZOOM = 3;
+const FOCUS_ZOOM = 2;
 const FOCUS_TIME = 1000; //in ms
 const PARALLAX_FACTOR = 0.05;
 const YEAR_RANGE = [1880,2030];
 const PADDING = 50;
-const POPUP_WIDTH = 400;
+const POPUP_WIDTH = 500;
 const POPUP_HEIGHT = 400;
 const BACKGROUND_OFFSET = 550;
 const BACKGROUND_SVG_WIDTH = 2000;
 const BACKGROUND_SVG_HEIGHT = 500;
+
+const HORIZON_LINE = (14/16);
+const SKY_COLOR = "#BADDF8";
+const GRASS_COLOR = "#A3C57E";
+
+const ARROW_OPACITY = 0.8;
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT07Dq-7PcVOBl4x_lc6G7_wNK6sUgFIiQYZ082JTpRi1kTcJzspmwqVvXRiHEOJioDXl_igTos9LiS/pub?gid=0&single=true&output=csv"
 
@@ -22,12 +28,16 @@ var DOT_RADIUS = 5;
 var SELECTED_DOT_RADIUS = 7;
 var DOT_CLICK_RADIUS = 9;
 
+var IS_MOBILE = false;
+var IS_IFRAME = false;
+
 // SIZING //////////////////////////////////////////////////////////////////////////////////////////
 
 var svg = d3.select("svg")
 if(window.frameElement == null){
     if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        alert("MOBILE");
+        IS_MOBILE = true;
+
         var ratio = window.devicePixelRatio
         var w = document.documentElement.clientWidth;
         var h = document.documentElement.clientHeight;
@@ -46,6 +56,7 @@ if(window.frameElement == null){
 
     }
 } else { // We are in an iframe
+    IS_IFRAME = true;
     svg.attr("width", window.frameElement.offsetWidth);
     svg.attr("height", window.frameElement.offsetHeight);
 
@@ -68,7 +79,7 @@ var height = +svg.attr("height");
 
 var priorWidth = width;
 
-const EVENT_Y_POS = height * (7/8);
+const EVENT_Y_POS = height * (15/16);
 const BODY_Y_POS = height * (1/8);
 
 // DATA VARIABLES //////////////////////////////////////////////////////////////////////////////////
@@ -87,18 +98,34 @@ var offClickTarget = svg.append("rect")
     .on("click", offClickHandler)
     .attr("fill", "white")
 
+var background_sky = svg.append("g")
+
+background_sky
+    .append("rect")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("fill", GRASS_COLOR)
+
+background_sky
+    .append("rect")
+    .attr("width", "100%")
+    .attr("height", (100 * HORIZON_LINE) + "%")
+    .attr("fill", SKY_COLOR)
+    .on("click", offClickHandler)
+
 var background = svg.append("g")
     .attr("id", "background")
     .on("click", offClickHandler)
 
-d3.xml("background.svg").then((document) => {
+d3.xml("background_color.svg").then((document) => {
     background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
 
     var k = width/BACKGROUND_SVG_WIDTH;
-    var cy = height - BACKGROUND_SVG_HEIGHT * k;
+    var cy =  height * HORIZON_LINE - BACKGROUND_SVG_HEIGHT * k;
+    var dx = -width/3;
 
     d3.select("#overallRoot")
-        .attr("transform", "matrix(" + k + ",0,0," + k + ",0," +  (cy) + ")");
+        .attr("transform", "matrix(" + k + ",0,0," + k + "," + dx + "," +  (cy) + ")");
 
 })
 
@@ -224,7 +251,8 @@ svg.call(zoom);
 function zoomed() {
     var transform = d3.event.transform;
     var k = transform.k;
-    var cy = height;
+    var cy = height * HORIZON_LINE;
+
     eventParents.attr("transform", function(d) {
         return "translate(" + transform.applyX(d.x) + ", " + EVENT_Y_POS + ")";
     });
@@ -350,7 +378,7 @@ function formatHTML(data){
         out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg'><img src='" + data.img + "'/></td></table>"
     }
 
-    arrows = "  <svg viewBox='0 0 32 32' width='30' height='30' onclick='leftArrowHandler()' class='arrow'><polygon  scale='.5' points='32,0 23.349,16 32,32 0,16 '/></svg>  <svg viewBox='0 0 32 32' width='30' height='30' onclick='rightArrowHandler()' class='arrow'><polygon points='0,32 8.651,16 0,0 32,16 '/></svg>"
+    arrows = "  <svg viewBox='0 0 32 32' width='30' height='30' onclick='leftArrowHandler()' class='arrow'><polygon  fill-opacity='" + ARROW_OPACITY + "' scale='.5' points='32,0 23.349,16 32,32 0,16 '/></svg>  <svg viewBox='0 0 32 32' width='30' height='30' onclick='rightArrowHandler()' class='arrow'><polygon fill-opacity='" + ARROW_OPACITY + "' points='0,32 8.651,16 0,0 32,16 '/></svg>"
 
 
     out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + arrows + "</h1>" + out + "<br>" + "</div>"
@@ -364,11 +392,12 @@ function handleResize(new_width, new_height){
 
     offClickTarget.attr("width", new_width);
 
-    var k = new_width/BACKGROUND_SVG_WIDTH;
-    var cy = new_height - BACKGROUND_SVG_HEIGHT * k;
+    var k = width/BACKGROUND_SVG_WIDTH;
+    var cy =  height * HORIZON_LINE - BACKGROUND_SVG_HEIGHT * k;
+    var dx = -width/3;
 
     d3.select("#overallRoot")
-        .attr("transform", "matrix(" + k + ",0,0," + k + ",0," +  (cy) + ")");
+        .attr("transform", "matrix(" + k + ",0,0," + k + "," + dx + "," +  (cy) + ")");
 
     timescale.range([PADDING, new_width-PADDING]);
 
