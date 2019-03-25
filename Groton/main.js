@@ -30,48 +30,86 @@ var DOT_CLICK_RADIUS = 9;
 
 var IS_MOBILE = false;
 var IS_IFRAME = false;
+var IS_PORTRAIT = false;
+var IS_ACTIVE = true;
+
+var PORTRAIT_POPUP_RATIO = 0.85;
 
 // SIZING //////////////////////////////////////////////////////////////////////////////////////////
 
 var svg = d3.select("svg")
-if(window.frameElement == null){
-    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        IS_MOBILE = true;
 
-        var ratio = window.devicePixelRatio
-        var w = document.documentElement.clientWidth;
-        var h = document.documentElement.clientHeight;
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    IS_MOBILE = true;
+}
 
-        if(w > h){
-            svg.attr("width", w);
-            svg.attr("height", h);
-        } else {
-            svg.attr("width", h);
-            svg.attr("height", w);
+if(window.frameElement != null){ // We are in an iframe
+    IS_IFRAME = true;
+
+    if(!IS_MOBILE){ // Desktop
+        svg.attr("width", window.frameElement.offsetWidth);
+        svg.attr("height", window.frameElement.offsetHeight);
+
+        console.log("frame")
+        console.log(window.frameElement)
+
+        window.onresize = function(e){
+            console.log('resize from inside');
+            console.log(e);
+            console.log(window.frameElement.offsetWidth);
+            desktopResize(window.frameElement.offsetWidth, window.frameElement.offsetHeight);
+        }
+    } else { // Mobile
+
+        if(window.orientation == 0 || window.orientation == 180){ // portrait
+            window.frameElement.height = 600;
+            window.frameElement.width = window.frameElement.offsetWidth;
+
+            IS_PORTRAIT = true;
+
+        } else { // landscape
+            window.frameElement.width = window.frameElement.offsetWidth;
+            window.frameElement.height = window.frameElement.offsetWidth * screen.width/screen.height;
+
+            IS_PORTRAIT = false;
         }
 
-        DOT_RADIUS *= 1.5;
-        SELECTED_DOT_RADIUS *= 1.5;
-        DOT_CLICK_RADIUS *= 1.5;
+        svg.attr("width", window.frameElement.offsetWidth);
+        svg.attr("height", window.frameElement.offsetHeight);
 
+        window.addEventListener("orientationchange", function(){
+            if(window.orientation == 0 || window.orientation == 180){ // portrait
+                IS_PORTRAIT = true;
+                window.frameElement.width = "100%"
+                setTimeout(function () {
+
+                    window.frameElement.height = 600;
+
+                    svg.attr("width", window.frameElement.width);
+                    svg.attr("height", window.frameElement.height);
+
+                    mobileResize(window.frameElement.offsetWidth, window.frameElement.offsetHeight);
+                    unfocus();
+                    resetZoom();
+                }, 500);
+
+
+            } else { // landscape
+                IS_PORTRAIT = false;
+                window.frameElement.width = "100%"
+                setTimeout(function () {
+                    window.frameElement.height = window.frameElement.offsetWidth * screen.width/screen.height;
+
+                    svg.attr("width", window.frameElement.width);
+                    svg.attr("height", window.frameElement.height);
+
+                    mobileResize(window.frameElement.offsetWidth, window.frameElement.offsetHeight);
+                    unfocus();
+                    resetZoom();
+                }, 500);
+            }
+        })
     }
-} else { // We are in an iframe
-    IS_IFRAME = true;
-    svg.attr("width", window.frameElement.offsetWidth);
-    svg.attr("height", window.frameElement.offsetHeight);
-
-    console.log("frame")
-    console.log(window.frameElement)
-
-    window.onresize = function(e){
-        console.log('resize from inside');
-        console.log(e);
-        console.log(window.frameElement.offsetWidth);
-
-        handleResize(window.frameElement.offsetWidth, window.frameElement.offsetHeight);
-
-    }
-
 }
 
 var width = +svg.attr("width");
@@ -79,8 +117,8 @@ var height = +svg.attr("height");
 
 var priorWidth = width;
 
-const EVENT_Y_POS = height * (15/16);
-const BODY_Y_POS = height * (1/8);
+var EVENT_Y_POS = height * (15/16);
+var BODY_Y_POS = height * (1/8);
 
 // DATA VARIABLES //////////////////////////////////////////////////////////////////////////////////
 var currentData = dataJson[0]
@@ -90,23 +128,15 @@ var isFocused = false;
 // SETUP ///////////////////////////////////////////////////////////////////////////////////////////
 d3.select("body").on("keydown", keyHandler)
 
-var offClickTarget = svg.append("rect")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("x", 0)
-    .attr("y", 0)
-    .on("click", offClickHandler)
-    .attr("fill", "white")
-
 var background_sky = svg.append("g")
 
-background_sky
+var grass = background_sky
     .append("rect")
     .attr("width", "100%")
     .attr("height", "100%")
     .attr("fill", GRASS_COLOR)
 
-background_sky
+var sky = background_sky
     .append("rect")
     .attr("width", "100%")
     .attr("height", (100 * HORIZON_LINE) + "%")
@@ -117,8 +147,8 @@ var background = svg.append("g")
     .attr("id", "background")
     .on("click", offClickHandler)
 
-d3.xml("background_color.svg").then((document) => {
-    background.node().appendChild(document.getElementsByTagName('svg')[0].getElementById('overallRoot'))
+d3.xml("background_color.svg").then((loaded) => {
+    background.node().appendChild(loaded.getElementsByTagName('svg')[0].getElementById('overallRoot'))
 
     var k = width/BACKGROUND_SVG_WIDTH;
     var cy =  height * HORIZON_LINE - BACKGROUND_SVG_HEIGHT * k;
@@ -136,9 +166,21 @@ var popupG = d3.select("svg")
 
 var popup = popupG
     .append("foreignObject")
-    .attr("x",-POPUP_WIDTH/2)
+    .attr("x",() => {
+        if(!IS_PORTRAIT){
+            return -POPUP_WIDTH/2
+        } else {
+            return -(width * PORTRAIT_POPUP_RATIO)/2
+        }
+    })
     .attr("y",0)
-    .attr("width",POPUP_WIDTH)
+    .attr("width",() => {
+        if(!IS_PORTRAIT){
+            return POPUP_WIDTH;
+        } else {
+            return (width * PORTRAIT_POPUP_RATIO);
+        }
+    })
     .attr("height",POPUP_HEIGHT)
     .attr("class","node")
     .attr("id", "popup")
@@ -249,22 +291,24 @@ var zoom = d3.zoom()
 svg.call(zoom);
 
 function zoomed() {
-    var transform = d3.event.transform;
-    var k = transform.k;
-    var cy = height * HORIZON_LINE;
 
-    eventParents.attr("transform", function(d) {
-        return "translate(" + transform.applyX(d.x) + ", " + EVENT_Y_POS + ")";
-    });
-    timelineParents.attr("transform", function(d) {
-        return "translate(" + transform.applyX(timescale(d)) + ", " + EVENT_Y_POS + ")";
-    })
-    // background.attr("transform", "translate(" + transform.x + ",0) scale(" + transform.k + ")")
-    background.attr("transform", "matrix(" + k + ",0,0," + k + "," + (transform.x * (1 + PARALLAX_FACTOR)) + "," +  (cy - (k*cy)) + ")");
+    if(IS_ACTIVE){
+        var transform = d3.event.transform;
+        var k = transform.k;
+        var cy = height * HORIZON_LINE;
 
-    popupG
-        .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
+        eventParents.attr("transform", function(d) {
+            return "translate(" + transform.applyX(d.x) + ", " + EVENT_Y_POS + ")";
+        });
+        timelineParents.attr("transform", function(d) {
+            return "translate(" + transform.applyX(timescale(d)) + ", " + EVENT_Y_POS + ")";
+        })
 
+        background.attr("transform", "matrix(" + k + ",0,0," + k + "," + (transform.x * (1 + PARALLAX_FACTOR)) + "," +  (cy - (k*cy)) + ")");
+
+        popupG
+            .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
+    }
 
 }
 
@@ -296,7 +340,6 @@ function keyHandler(){
 }
 
 function leftArrowHandler(){
-    console.log("left")
     if(currentIndex > 0){
         focusOnIndex(currentIndex -1);
     }
@@ -381,16 +424,16 @@ function formatHTML(data){
     arrows = "  <svg viewBox='0 0 32 32' width='30' height='30' onclick='leftArrowHandler()' class='arrow'><polygon  fill-opacity='" + ARROW_OPACITY + "' scale='.5' points='32,0 23.349,16 32,32 0,16 '/></svg>  <svg viewBox='0 0 32 32' width='30' height='30' onclick='rightArrowHandler()' class='arrow'><polygon fill-opacity='" + ARROW_OPACITY + "' points='0,32 8.651,16 0,0 32,16 '/></svg>"
 
 
-    out = "<div class='popupDiv'>" + "<h1 class='year'>" + data.year + arrows + "</h1>" + out + "<br>" + "</div>"
+    out = "<div class='popupDiv' id='popupDiv'>" + "<h1 class='year'>" + data.year + arrows + "</h1>" + out + "<br>" + "</div>"
 
     return out;
 }
 
-function handleResize(new_width, new_height){
+function desktopResize(new_width, new_height){
 
     svg.attr("width", new_width)
 
-    offClickTarget.attr("width", new_width);
+    // offClickTarget.attr("width", new_width);
 
     var k = width/BACKGROUND_SVG_WIDTH;
     var cy =  height * HORIZON_LINE - BACKGROUND_SVG_HEIGHT * k;
@@ -413,4 +456,54 @@ function handleResize(new_width, new_height){
     zoom.translateExtent([[0-100,0],[new_width + 100,0]]);
 
     width = new_width;
+
+    //TODO: Force change in window or something to make these changes apply without having to
+    //move the view box
+}
+
+function mobileResize(new_width, new_height){
+
+
+    width = new_width;
+    height = new_height;
+
+    //Background
+    var k = width/BACKGROUND_SVG_WIDTH;
+    var cy =  height * HORIZON_LINE - BACKGROUND_SVG_HEIGHT * k;
+    var dx = -width/3;
+
+    d3.select("#overallRoot")
+        .attr("transform", "matrix(" + k + ",0,0," + k + "," + dx + "," +  (cy) + ")");
+
+    //Popup
+    BODY_Y_POS = height * (1/8);
+    popup.attr("x",() => {
+        if(!IS_PORTRAIT){
+            return -POPUP_WIDTH/2
+        } else {
+            return -(width * PORTRAIT_POPUP_RATIO)/2
+        }
+    })
+    .attr("width",() => {
+        if(!IS_PORTRAIT){
+            return POPUP_WIDTH;
+        } else {
+            return (width * PORTRAIT_POPUP_RATIO);
+        }
+    })
+
+    //timeline nodes
+    EVENT_Y_POS = height * (15/16);
+
+    timescale.range([PADDING, new_width-PADDING]);
+
+    sim.nodes().forEach((d) => {
+        d.x = timescale(d.year);
+        d.y = EVENT_Y_POS;
+    });
+    sim.force("x", d3.forceX(function(d) { return timescale(d.year); }).strength(0.1))
+    for (var i = 0; i < SIMULATION_TICKS; i++) {sim.tick();}
+
+    zoom.translateExtent([[0-100,0],[new_width + 100,0]]);
+
 }
