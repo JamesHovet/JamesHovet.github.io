@@ -385,13 +385,8 @@ function focusOnIndex(index){
     var span = document.getElementsByClassName("close")[0];
 
     // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    modal.onclick = function(){
-        modal.style.display = "none";
-    }
+    span.onclick = unfocusImgModal;
+    modal.onclick = unfocusImgModal;
 
     var selectedEvent = selectAtIndex(circles, index);
     selectedEvent.classed("selectedEvent", true);
@@ -399,14 +394,24 @@ function focusOnIndex(index){
 
 }
 
+unfocusImgModal = function(){
+    var modal = document.getElementById('myModal');
+    modal.style.display = "none";
+}
+
+
 function unfocus(){
     isFocused = false;
+
+    unfocusImgModal();
 
     circles.classed("selectedEvent", false);
     circles.classed("eventDot", true);
     circles.attr("r", DOT_RADIUS);
 
     popup.style("opacity", 0);
+    popupG.attr("transform", "translate(-" + width + ",-" + height + ")")
+
 }
 
 function resetZoom(){
@@ -446,7 +451,11 @@ function formatHTML(data){
         if(data.hasOwnProperty("imgCaption")){
             caption = data.imgCaption;
         }
-        out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg' id='popupImg'><img src='" + data.img + "' alt='" + caption + "'/></td></table>"
+        if(IS_MOBILE && IS_PORTRAIT){
+            out = "<table><tr class='popupText'><td><div>" + data.body + "</div></td></tr><tr class='popupImg' id='popupImg'><td><img style='margin: auto; display: block;' src='" + data.img + "' alt='" + caption + "'/></td></tr></table>"
+        } else {
+            out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg' id='popupImg'><img src='" + data.img + "' alt='" + caption + "'/></td></table>"
+        }
     }
 
     arrows = "  <svg viewBox='0 0 32 32' width='30' height='30' onclick='leftArrowHandler()' class='arrow'><polygon  fill-opacity='" + ARROW_OPACITY + "' scale='.5' points='32,0 23.349,16 32,32 0,16 '/></svg>  <svg viewBox='0 0 32 32' width='30' height='30' onclick='rightArrowHandler()' class='arrow'><polygon fill-opacity='" + ARROW_OPACITY + "' points='0,32 8.651,16 0,0 32,16 '/></svg>"
@@ -537,5 +546,4 @@ function mobileResize(new_width, new_height){
 }
 
 // TODO: Responsive timeline increments
-// TODO: Vertical and/or better pictures on mobile
 // TODO: Introduction/'click here to start' (with text that says 'rotate your phone into lanscape for the best experience')
