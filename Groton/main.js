@@ -10,8 +10,9 @@ const YEAR_RANGE = [1880,2030];
 const PADDING = 50;
 const POPUP_WIDTH = 500;
 const POPUP_HEIGHT = 400;
-const BACKGROUND_OFFSET = 550;
-const BACKGROUND_SVG_WIDTH = 2000;
+const EVENT_Y_POS_FACTOR = 15/16;
+const BODY_Y_POS_FACTOR = 1/16;
+const BACKGROUND_SVG_WIDTH = 2100;
 const BACKGROUND_SVG_HEIGHT = 500;
 
 const HORIZON_LINE = (14/16);
@@ -117,8 +118,8 @@ var height = +svg.attr("height");
 
 var priorWidth = width;
 
-var EVENT_Y_POS = height * (15/16);
-var BODY_Y_POS = height * (1/8);
+var EVENT_Y_POS = height * EVENT_Y_POS_FACTOR;
+var BODY_Y_POS = height * BODY_Y_POS_FACTOR;
 
 // DATA VARIABLES //////////////////////////////////////////////////////////////////////////////////
 var currentData = dataJson[0]
@@ -507,3 +508,7 @@ function mobileResize(new_width, new_height){
     zoom.translateExtent([[0-100,0],[new_width + 100,0]]);
 
 }
+
+// TODO: Responsive timeline increments
+// TODO: Vertical and/or better pictures on mobile
+// TODO: Introduction/'click here to start' (with text that says 'rotate your phone into lanscape for the best experience')
