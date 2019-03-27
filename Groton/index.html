@@ -1,90 +1,98 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-    svg {
-        background-color: white;
-    }
+<head>
+    <style>
+        svg {
+            background-color: white;
+        }
 
-    #background {
-        fill: #E9E9E9;
-        /* fill: whitesmoke; */
-    }
+        #background {
+            fill: #E9E9E9;
+            /* fill: whitesmoke; */
+        }
 
-    .debugText {
-        display: none;
-    }
+        .debugText {
+            display: none;
+        }
 
-    .timelineNotches {
-        stroke: darkgrey;
-        stroke-width: 1px;
-    }
+        .timelineNotches {
+            stroke: darkgrey;
+            stroke-width: 1px;
+        }
 
-    .timelineDates {
-        font-family: "Palatino", serif;
-    }
+        .timelineDates {
+            font-family: "Palatino", serif;
+        }
 
-    .eventDot {
-        fill: #8C1217;
-    }gi
+        .eventDot {
+            fill: #8C1217;
+        }gi
 
-    .selectedEvent {
-        fill: #8C1217;
-        stroke: #C01127;
-        stroke-width: 2px;
-    }
+        .selectedEvent {
+            fill: #8C1217;
+            stroke: #C01127;
+            stroke-width: 2px;
+        }
 
-    .popupImg img {
-        max-height: 300px;
-        max-width: 200px;
-    }
+        .popupImg img {
+            max-height: 300px;
+            max-width: 200px;
+        }
 
-    .reverse {
-        -webkit-transform: rotate(-180deg);
-        -webkit-transform-origin: center center;
-        -moz-transform: rotate(-180deg);
-        transform: rotate(-180deg);
+        .reverse {
+            -webkit-transform: rotate(-180deg);
+            -webkit-transform-origin: center center;
+            -moz-transform: rotate(-180deg);
+            transform: rotate(-180deg);
 
-        display: inline-block;
-    }
+            display: inline-block;
+        }
 
-    .arrow {
-        /* width: 20px; */
+        .arrow {
+            /* width: 20px; */
 
-        background: none;
-        fill: black;
-        border: none;
-        padding: 0;
-        font: inherit;
-        cursor: pointer;
-        outline: inherit;
-    }
+            background: none;
+            fill: black;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            outline: inherit;
+        }
 
-    .circleClickTarget {
-        opacity: 0;
-    }
+        .circleClickTarget {
+            opacity: 0;
+        }
 
-    .arrow:hover {
-        fill: #363636;
-    }
+        .arrow:hover {
+            fill: #363636;
+        }
 
-    .popupDiv {
-        background-color: white;
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 5px;
-        border-radius: 15px;
-    }
+        .popupDiv {
+            background-color: white;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 5px;
+            border-radius: 15px;
+        }
 
-    #popup {
-        /* background-color: white; */
-        /* stroke: 1px black; */
-        font: 1.2em "Georgia";
-    }
-</style>
-
+        #popup {
+            /* background-color: white; */
+            /* stroke: 1px black; */
+            font: 1.2em "Georgia";
+        }
+    </style>
+</head>
 <body>
     <svg width="900" height="600" id="root">
     </svg>
 </body>
+<!-- D3.js -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
+<!-- jQuery -->
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<!-- ensure new jQuery doesn't mess with any other jQuery that may be active -->
+<!-- <script>
+$.noConflict();
+</script> --> -->
 <script src="./main.js"></script>
