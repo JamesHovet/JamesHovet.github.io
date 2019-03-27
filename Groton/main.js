@@ -215,6 +215,7 @@ d3.csv(CSV_URL, function(d, i){
         year : +d.year,
         body : d.body,
         img : d.img,
+        imgCaption : d.imgCaption,
         x : timescale(d.year) + 0.01 * i, // cheat: add a little bit of a push to the initial starting positions of all the nodes so that order is maintained after the simulation
         y : EVENT_Y_POS,
         fy : EVENT_Y_POS
@@ -370,6 +371,28 @@ function focusOnIndex(index){
     popupG
         .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
 
+    var modal = document.getElementById('myModal');
+
+    var img = document.getElementById('popupImg');
+    var modalImg = document.getElementById("modalImg");
+    var captionText = document.getElementById("caption");
+    img.onclick = function(){
+        modal.style.display = "block";
+        modalImg.src = currentData.img;
+        captionText.innerHTML = currentData.imgCaption;
+    }
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    modal.onclick = function(){
+        modal.style.display = "none";
+    }
+
     var selectedEvent = selectAtIndex(circles, index);
     selectedEvent.classed("selectedEvent", true);
     selectedEvent.attr("r", SELECTED_DOT_RADIUS)
@@ -419,7 +442,11 @@ function selectAtIndex(selection, index){
 function formatHTML(data){
     out = data.body
     if(data.hasOwnProperty("img")){
-        out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg'><img src='" + data.img + "'/></td></table>"
+        var caption = "";
+        if(data.hasOwnProperty("imgCaption")){
+            caption = data.imgCaption;
+        }
+        out = "<table><td class='popupText'><div>" + data.body + "</div></td><td class='popupImg' id='popupImg'><img src='" + data.img + "' alt='" + caption + "'/></td></table>"
     }
 
     arrows = "  <svg viewBox='0 0 32 32' width='30' height='30' onclick='leftArrowHandler()' class='arrow'><polygon  fill-opacity='" + ARROW_OPACITY + "' scale='.5' points='32,0 23.349,16 32,32 0,16 '/></svg>  <svg viewBox='0 0 32 32' width='30' height='30' onclick='rightArrowHandler()' class='arrow'><polygon fill-opacity='" + ARROW_OPACITY + "' points='0,32 8.651,16 0,0 32,16 '/></svg>"
