@@ -6,16 +6,19 @@ const SIMULATION_DOT_RADIUS = 3;
 const FOCUS_ZOOM = 2;
 const FOCUS_TIME = 1000; //in ms
 const PARALLAX_FACTOR = 0.05;
-const YEAR_RANGE = [1880,2030];
+const YEAR_RANGE = [1880,2040];
+const DEFAULT_YEAR_INCREMENT = 10;
+const SECONDARY_DATE_ZOOM_CUTOFF = 2.5;
+const SECONDARY_DATE_WIDTH_CUTOFF = 700;
 const PADDING = 50;
 const POPUP_WIDTH = 500;
 const POPUP_HEIGHT = 400;
-const EVENT_Y_POS_FACTOR = 15/16;
+const EVENT_Y_POS_FACTOR = 29/32;
 const BODY_Y_POS_FACTOR = 1/16;
 const BACKGROUND_SVG_WIDTH = 2100;
 const BACKGROUND_SVG_HEIGHT = 500;
 
-const HORIZON_LINE = (14/16);
+const HORIZON_LINE = (27/32);
 const SKY_COLOR = "#BADDF8";
 const GRASS_COLOR = "#A3C57E";
 
@@ -38,7 +41,7 @@ var PORTRAIT_POPUP_RATIO = 0.85;
 
 // SIZING //////////////////////////////////////////////////////////////////////////////////////////
 
-var svg = d3.select("svg")
+var svg = d3.select("#timeline_hovet_svg")
 
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
     IS_MOBILE = true;
@@ -69,8 +72,12 @@ if(window.frameElement != null){ // We are in an iframe
             IS_PORTRAIT = true;
 
         } else { // landscape
+
+            var shorter = Math.min(screen.height, screen.width)
+            var longer = Math.max(screen.height, screen.width)
+
             window.frameElement.width = window.frameElement.offsetWidth;
-            window.frameElement.height = window.frameElement.offsetWidth * screen.width/screen.height;
+            window.frameElement.height = window.frameElement.offsetWidth * shorter/longer;
 
             IS_PORTRAIT = false;
         }
@@ -99,7 +106,10 @@ if(window.frameElement != null){ // We are in an iframe
                 IS_PORTRAIT = false;
                 window.frameElement.width = "100%"
                 setTimeout(function () {
-                    window.frameElement.height = window.frameElement.offsetWidth * screen.width/screen.height;
+                    var shorter = Math.min(screen.height, screen.width)
+                    var longer = Math.max(screen.height, screen.width)
+
+                    window.frameElement.height = window.frameElement.offsetWidth * shorter/longer;
 
                     svg.attr("width", window.frameElement.width);
                     svg.attr("height", window.frameElement.height);
@@ -217,8 +227,8 @@ d3.csv(CSV_URL, function(d, i){
         img : d.img,
         imgCaption : d.imgCaption,
         x : timescale(d.year) + 0.01 * i, // cheat: add a little bit of a push to the initial starting positions of all the nodes so that order is maintained after the simulation
-        y : EVENT_Y_POS,
-        fy : EVENT_Y_POS
+        y : height * EVENT_Y_POS_FACTOR,
+        fy : height * EVENT_Y_POS_FACTOR
     };
 }).then(function(data) {
 
@@ -260,7 +270,7 @@ d3.csv(CSV_URL, function(d, i){
 });
 
 // INCREMENTS //////////////////////////////////////////////////////////////////////////////////////
-var yearIncrements = getIncrements(YEAR_RANGE);
+var yearIncrements = getIncrements(YEAR_RANGE, DEFAULT_YEAR_INCREMENT);
 
 var timeline = root.append("g")
     .attr("id", "timeline")
@@ -269,7 +279,8 @@ var timelineParents = timeline.selectAll("g")
     .data(yearIncrements)
     .enter()
         .append("g")
-        .attr("transform", (d) => {return "translate(" + timescale(d) + "," + EVENT_Y_POS + ")";})
+        .attr("transform", (d) => {return "translate(" + timescale(d) + "," + height * EVENT_Y_POS_FACTOR + ")";})
+        .classed("timelineParents", true)
 
 var timelineNotches = timelineParents
     .append("line")
@@ -283,6 +294,14 @@ var timelineDates = timelineParents
     .attr("transform", "translate(0," + DATE_Y_SHIFT + ")")
     .attr("text-anchor", "middle")
     .classed("timelineDates", true)
+
+var everyOtherTimelineDate = timelineDates.filter((d, i) => {
+    return d % (2 * DEFAULT_YEAR_INCREMENT) != 0
+})
+
+if(width < SECONDARY_DATE_WIDTH_CUTOFF){
+    everyOtherTimelineDate.style("opacity", 0.0)
+}
 
 // ZOOM ////////////////////////////////////////////////////////////////////////////////////////////
 var zoom = d3.zoom()
@@ -300,16 +319,20 @@ function zoomed() {
         var cy = height * HORIZON_LINE;
 
         eventParents.attr("transform", function(d) {
-            return "translate(" + transform.applyX(d.x) + ", " + EVENT_Y_POS + ")";
+            return "translate(" + transform.applyX(d.x) + ", " + height * EVENT_Y_POS_FACTOR + ")";
         });
         timelineParents.attr("transform", function(d) {
-            return "translate(" + transform.applyX(timescale(d)) + ", " + EVENT_Y_POS + ")";
+            return "translate(" + transform.applyX(timescale(d)) + ", " + height * EVENT_Y_POS_FACTOR + ")";
         })
 
         background.attr("transform", "matrix(" + k + ",0,0," + k + "," + (transform.x * (1 + PARALLAX_FACTOR)) + "," +  (cy - (k*cy)) + ")");
 
         popupG
-            .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
+            .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + height * BODY_Y_POS_FACTOR + ")");
+
+        if(width < SECONDARY_DATE_WIDTH_CUTOFF)
+        everyOtherTimelineDate.style("opacity", k - SECONDARY_DATE_ZOOM_CUTOFF)
+
     }
 
 }
@@ -369,7 +392,7 @@ function focusOnIndex(index){
         .style("opacity", 1)
         .html(formatHTML(currentData));
     popupG
-        .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + BODY_Y_POS + ")");
+        .attr("transform", "translate(" + transform.applyX(timescale(currentData.year)) + "," + height * BODY_Y_POS_FACTOR + ")");
 
     var modal = document.getElementById('myModal');
 
@@ -422,6 +445,10 @@ function smoothTranslateTo(x,y, time){
     svg.transition().duration(time).call(zoom.translateTo, x, y);
 }
 
+function zoomToSelf(){
+    svg.call(zoom.translateBy, 0,0);
+}
+
 function focusZoom(x,k,time){
     var zoomTo = d3.zoomIdentity
         .translate(width/2 - (x*k),0)
@@ -431,11 +458,11 @@ function focusZoom(x,k,time){
 }
 
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////
-function getIncrements(range) {
+function getIncrements(range, delta) {
     var lower = range[0];
     var upper = range[1];
-    var increments = (upper - lower)/10 + 1;
-    return [...Array(increments).keys()].map((d) => {return lower + d * 10;})
+    var increments = (upper - lower)/delta + 1;
+    return [...Array(increments).keys()].map((d) => {return lower + d * delta;})
 }
 
 function selectAtIndex(selection, index){
@@ -466,15 +493,17 @@ function formatHTML(data){
     return out;
 }
 
+// RESIZING ////////////////////////////////////////////////////////////////////////////////////////
+
 function desktopResize(new_width, new_height){
 
     svg.attr("width", new_width)
 
     // offClickTarget.attr("width", new_width);
 
-    var k = width/BACKGROUND_SVG_WIDTH;
-    var cy =  height * HORIZON_LINE - BACKGROUND_SVG_HEIGHT * k;
-    var dx = -width/3;
+    var k = new_width/BACKGROUND_SVG_WIDTH;
+    var cy =  new_height * HORIZON_LINE - BACKGROUND_SVG_HEIGHT * k;
+    var dx = -new_width/3;
 
     d3.select("#overallRoot")
         .attr("transform", "matrix(" + k + ",0,0," + k + "," + dx + "," +  (cy) + ")");
@@ -494,8 +523,7 @@ function desktopResize(new_width, new_height){
 
     width = new_width;
 
-    //TODO: Force change in window or something to make these changes apply without having to
-    //move the view box
+    zoomToSelf();
 }
 
 function mobileResize(new_width, new_height){
@@ -513,7 +541,7 @@ function mobileResize(new_width, new_height){
         .attr("transform", "matrix(" + k + ",0,0," + k + "," + dx + "," +  (cy) + ")");
 
     //Popup
-    BODY_Y_POS = height * (1/8);
+
     popup.attr("x",() => {
         if(!IS_PORTRAIT){
             return -POPUP_WIDTH/2
@@ -529,21 +557,40 @@ function mobileResize(new_width, new_height){
         }
     })
 
-    //timeline nodes
-    EVENT_Y_POS = height * (15/16);
 
     timescale.range([PADDING, new_width-PADDING]);
 
     sim.nodes().forEach((d) => {
         d.x = timescale(d.year);
-        d.y = EVENT_Y_POS;
+        d.y = height * EVENT_Y_POS_FACTOR;
     });
     sim.force("x", d3.forceX(function(d) { return timescale(d.year); }).strength(0.1))
     for (var i = 0; i < SIMULATION_TICKS; i++) {sim.tick();}
 
     zoom.translateExtent([[0-100,0],[new_width + 100,0]]);
 
+    zoomToSelf();
+
 }
 
-// TODO: Responsive timeline increments
-// TODO: Introduction/'click here to start' (with text that says 'rotate your phone into lanscape for the best experience')
+// CLICK TO START //////////////////////////////////////////////////////////////////////////////////
+
+var overlay_text = "<h2>Explore Groton's history with this interactive timeline.</h2>"
+
+if(IS_PORTRAIT){
+    overlay_text += "<h4>Rotate your device into landscape for the best experience.</h4>"
+}
+
+overlay_text += "<button>Start</button>"
+
+var overlay = d3.select("#timeline_hovet")
+    .append("div")
+    .classed("overlay", true)
+
+overlay.append("div")
+    .classed("overlay_text", true)
+    .html(overlay_text)
+
+overlay.on("click", () => {
+    overlay.attr("style", "display:none;")
+})
