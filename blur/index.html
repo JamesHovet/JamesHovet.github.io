@@ -1,0 +1,54 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--  <head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <title>Hello wasm-pack!</title>-->
+<!--  </head>-->
+<!--  <body>-->
+<!--    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>-->
+<!--    <script src="./bootstrap.js"></script>-->
+<!--  </body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Extract Bytes</title>
+</head>
+<body>
+
+<h1>Random Sample Blur</h1>
+<h2>A Stylized "Bad" Blurring Algorithm</h2>
+
+<script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css"/>
+
+<img-comparison-slider>
+    <img id="img-comparison-first" slot="first" src="static/img/fruits.png" />
+    <img id="img-comparison-second" slot="second" src="static/img/fruits_blurred_sample.png" />
+</img-comparison-slider>
+
+<canvas id="offscreen_buffer" style="display: none"></canvas>
+
+<input type="file" id="imageInput" accept="image/*">
+<button id="extractButton">Extract Image Bytes</button>
+
+<input type="number" id="stdDevInput" value="5">
+<input type="number" id="numSamplesInput" value="5">
+<select id="sampleMethodSelect">
+    <option value="0">equal</option>
+    <option value="1" selected>linearly decreasing</option>
+</select>
+<select id="sampleContributionMethodSelect">
+    <option value="0">equal</option>
+    <option value="1" selected>gaussian falloff</option>
+    <option value="2">linear falloff</option>
+</select>
+
+<noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+<script src="./bootstrap.js"></script>
+
+</body>
+</html>
