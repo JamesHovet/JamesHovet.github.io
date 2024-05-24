@@ -15,37 +15,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Upload and Extract Bytes</title>
+    <title>Random Sample Blur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-optical-sizing: auto;
+            font-variation-settings: "wdth" 100;
+        }
+
+        h1 {
+            font-size: 3em;
+            font-weight: 350 !important;
+        }
+
+        h2 {
+            font-size: 1.7em;
+            font-weight: 300 !important;
+        }
+
+        h4 {
+            font-weight: 300 !important;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Random Sample Blur</h1>
-<h2>A Stylized "Bad" Blurring Algorithm</h2>
 
-<script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css"/>
 
-<img-comparison-slider>
-    <img id="img-comparison-first" slot="first" src="static/img/fruits.png" />
-    <img id="img-comparison-second" slot="second" src="static/img/fruits_blurred_sample.png" />
-</img-comparison-slider>
+<div class="container">
 
-<canvas id="offscreen_buffer" style="display: none"></canvas>
+    <h1 class="text-center">Random Sample Blur</h1>
+    <h2 class="text-center">A Stylized "Bad" Blurring Algorithm</h2>
+    <br>
 
-<input type="file" id="imageInput" accept="image/*">
-<button id="extractButton">Extract Image Bytes</button>
+    <div id="img-comparison-slider-container">
+        <img id="loading-gif" src="static/img/loading.gif" style="max-height: 700px; display: none; position: absolute; z-index: 100; top:50%; left:50%; transform: translate(-50%, -50%); pointer-events: none">
+        <img-comparison-slider value="75" id="img-comparison-slider" style="margin: 0 auto; display: block">
+            <img style="max-height: 700px; margin: 0 auto; display: block" id="img-comparison-first" slot="first" src="static/img/fruits.png" />
+            <img style="max-height: 700px; margin: 0 auto; display: block" id="img-comparison-second" slot="second" src="static/img/fruits_blurred_sample.png" />
+        </img-comparison-slider>
+    </div>
+    <br>
 
-<input type="number" id="stdDevInput" value="5">
-<input type="number" id="numSamplesInput" value="5">
-<select id="sampleMethodSelect">
-    <option value="0">equal</option>
-    <option value="1" selected>linearly decreasing</option>
-</select>
-<select id="sampleContributionMethodSelect">
-    <option value="0">equal</option>
-    <option value="1" selected>gaussian falloff</option>
-    <option value="2">linear falloff</option>
-</select>
+    <canvas id="offscreen_buffer" style="display: none"></canvas>
+
+    <div id="inputs">
+        <div class="row justify-content-md-center">
+            <h4>Upload an image or choose from one of the example images</h4>
+            <div class="col-4">
+                <div class="mb-3">
+                    <input class="form-control" type="file" id="imageInput" accept="image/*">
+                </div>
+            </div>
+            <div class="col-auto">
+                <div id="example-images-group" class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="options" id="fruit" autocomplete="off" checked="false">
+                    <label class="btn btn-outline-primary" for="fruit">Fruit</label>
+
+                    <input type="radio" class="btn-check" name="options" id="baboon" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="baboon">Baboon</label>
+
+                    <input type="radio" class="btn-check" name="options" id="sailboat" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="sailboat">Sailboat</label>
+
+                    <input type="radio" class="btn-check" name="options" id="empire_state" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="empire_state">NYC</label>
+
+                    <input type="radio" class="btn-check" name="options" id="lenna" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="lenna">"Lenna"</label>
+                </div>
+            </div>
+        </div>
+
+        <form class="row justify-content-md-center">
+            <div class="col-auto">
+                <label for="stdDevInput">Blur Radius Standard Deviation</label>
+                <input class="form-control" type="number" id="stdDevInput" value="10">
+            </div>
+            <div class="col-auto">
+                <label for="numSamplesInput">Number of Samples</label>
+                <input class="form-control" type="number" id="numSamplesInput" value="5">
+            </div>
+            <div class="col-auto">
+                <label for="sampleMethodSelect">Sample Method</label>
+                <select class="form-control" id="sampleMethodSelect">
+                    <option value="0">equal</option>
+                    <option value="1" selected>linearly decreasing</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="sampleContributionMethodSelect">Sample Contribution Method</label>
+                <select class="form-control" id="sampleContributionMethodSelect">
+                    <option value="0">equal</option>
+                    <option value="1" selected>gaussian falloff</option>
+                    <option value="2">linear falloff</option>
+                </select>
+            </div>
+        </form>
+        <br>
+        <div class="row justify-content-md-center">
+            <div class="col-md-auto">
+                <button class="btn btn-success" id="extractButton">Perform Blur</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="credits">
+        <h4>Credits</h4>
+        <p><em>Fruit, Baboon, and Sailboat: </em>USC Signal and Image Processing Institute <a href="http://sipi.usc.edu/database/">http://sipi.usc.edu/database/</a></p>
+        <p><em>NYC: </em>Wikimedia Commons <a href="https://commons.wikimedia.org/wiki/File:View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu_(cropped).jpg">https://commons.wikimedia.org/wiki/File:View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu_(cropped).jpg</a></p>
+        <p><em>"Lenna": </em>Morten Rieger Hannemose <a href="https://mortenhannemose.github.io/lena/">https://mortenhannemose.github.io/lena/</a></p>
+    </div>
+
+</div>
 
 <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
 <script src="./bootstrap.js"></script>
