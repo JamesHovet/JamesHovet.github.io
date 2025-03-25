@@ -23,7 +23,7 @@ a {
 
 .links a {
     left: 0;
-    -webkit-transition: left 0.5s ease-in-out;*/
+    -webkit-transition: left 0.5s ease-in-out;
     -moz-transition: left 0.5s ease-in-out;
     -o-transition: left 0.5s ease-in-out;
     transition: left 0.5s ease-in-out;
