@@ -24,7 +24,6 @@ function render(timestamp) {
 
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-    // draw a triangle in the center of the svg
     // Clear previous content
     while (svg.firstChild) {
         svg.removeChild(svg.firstChild);
@@ -33,12 +32,10 @@ function render(timestamp) {
     let g = document.createElementNS(SVG_NAMESPACE, "g");
     svg.appendChild(g);
 
-    // Calculate the center of the SVG
     let centerX = body.clientWidth / 2;
     let centerY = body.clientHeight / 2;
 
-    // Define the size of the triangle
-    let size = Math.min(body.clientWidth, body.clientHeight) / 4;
+    let size = Math.min(body.clientWidth, body.clientHeight) / 3;
 
     let rotationTheta = elapsed * 0.001; // Rotation speed (radians per millisecond)
 
@@ -49,10 +46,8 @@ function render(timestamp) {
     let target = vec3.fromValues(0, 0, 0); // Look at the origin
     let up = vec3.fromValues(0, 1, 0); // Up direction
     let view = mat4.lookAt(mat4.create(), eye, target, up);
-    // Combine the transformations
     let modelViewProjection = mat4.multiply(mat4.create(), projection, view);
     modelViewProjection = mat4.multiply(modelViewProjection, modelViewProjection, rotation);
-    // Apply the model-view-projection matrix to the vertices
 
     let tris = cube.map(triangle => {
         let vertex1 = vec3.transformMat4(vec3.create(), triangle._1, modelViewProjection);
@@ -70,50 +65,29 @@ function render(timestamp) {
 
     tris.forEach(triangle => {
         let points = triangle.map(point => {
-            // Project the 3D vertex to 2D screen coordinates
-            let x = centerX + (point[0] / point[2]) * size; // Perspective projection
-            let y = centerY - (point[1] / point[2]) * size; // Invert Y coordinate for SVG
+            let x = centerX + (point[0] / point[2]) * size;
+            let y = centerY - (point[1] / point[2]) * size;
             return [x, y];
         });
 
-        // Create the polygon element
         let polygon = document.createElementNS(SVG_NAMESPACE, "polygon");
         polygon.setAttribute("points", points.map(p => p.join(",")).join(" "));
         polygon.setAttribute("stroke", "grey");
         polygon.setAttribute("fill", "white");
 
-        // Append the polygon to the SVG group
         g.appendChild(polygon);
+
+        let circleX = centerX + (triangle.center[0] / triangle.center[2]) * size;
+        let circleY = centerY - (triangle.center[1] / triangle.center[2]) * size;
+        let circle = document.createElementNS(SVG_NAMESPACE, "circle");
+        circle.setAttribute("cx", circleX);
+        circle.setAttribute("cy", circleY);
+        circle.setAttribute("r", "0.1rem"); // Radius of the circle
+        circle.setAttribute("fill", "white"); // Fill color of the circle
+        circle.setAttribute("stroke", "grey"); // Stroke color of the circle
+
+        g.appendChild(circle);
     });
-
-
-    // // Calculate the vertices of the triangle
-    // let points = [
-    //     // Vertex 1 (top vertex)
-    //     [
-    //         centerX + size * Math.cos(rotationTheta),
-    //         centerY + size * Math.sin(rotationTheta)
-    //     ],
-    //     // Vertex 2 (bottom left vertex)
-    //     [
-    //         centerX + size * Math.cos(rotationTheta + 2 * Math.PI / 3),
-    //         centerY + size * Math.sin(rotationTheta + 2 * Math.PI / 3)
-    //     ],
-    //     // Vertex 3 (bottom right vertex)
-    //     [
-    //         centerX + size * Math.cos(rotationTheta + 4 * Math.PI / 3),
-    //         centerY + size * Math.sin(rotationTheta + 4 * Math.PI / 3)
-    //     ]
-    // ];
-    //
-    // // Create the polygon element
-    // let polygon = document.createElementNS(SVG_NAMESPACE, "polygon");
-    // polygon.setAttribute("points", points.map(p => p.join(",")).join(" "));
-    // polygon.setAttribute("stroke", "grey");
-    // polygon.setAttribute("fill", "white");
-    //
-    // // Append the polygon to the SVG
-    // g.appendChild(polygon);
 
     requestAnimationFrame(render)
 }
