@@ -1,11 +1,14 @@
 let body = document.body;
 let svg = document.getElementById("backgroundSvg");
+svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 let startTime;
 let stop = false;
 let fps = 60;
 let fpsInterval = 1000 / fps;
 let then;
 let now;
+let elementsExist = false;
+let g = null;
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 window.onload = function() {
@@ -34,20 +37,18 @@ function render(timestamp) {
 
         svg.setAttribute("width", body.clientWidth);
         svg.setAttribute("height", body.clientHeight);
+        svg.setAttribute("stroke-width", "0.03rem");
 
         // Update the viewBox to match the new width and height
         let viewBox = `0 0 ${body.clientWidth} ${body.clientHeight}`;
         svg.setAttribute("viewBox", viewBox);
 
-        svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-        // Clear previous content
-        while (svg.firstChild) {
-            svg.removeChild(svg.firstChild);
+        if (!elementsExist) {
+            g = document.createElementNS(SVG_NAMESPACE, "g");
+            svg.appendChild(g);
         }
 
-        let g = document.createElementNS(SVG_NAMESPACE, "g");
-        svg.appendChild(g);
 
         let centerX = body.clientWidth / 2;
         let centerY = body.clientHeight / 2;
@@ -73,13 +74,14 @@ function render(timestamp) {
             return new MyTriangle(vertex1, vertex2, vertex3);
         });
 
+        let down = vec3.fromValues(0, -1, 0); // Down direction for sorting
         tris.sort((a, b) => {
-            let aCenterDot = vec3.dot(a.center, up);
-            let bCenterDot = vec3.dot(b.center, up);
+            let aCenterDot = vec3.dot(a.center, down);
+            let bCenterDot = vec3.dot(b.center, down);
             return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
-
         });
 
+        let idx = 0;
         tris.forEach(triangle => {
             let points = triangle.map(point => {
                 let x = centerX + (point[0] / point[2]) * size;
@@ -87,24 +89,38 @@ function render(timestamp) {
                 return [x, y];
             });
 
-            let polygon = document.createElementNS(SVG_NAMESPACE, "polygon");
-            polygon.setAttribute("points", points.map(p => p.join(",")).join(" "));
-            polygon.setAttribute("stroke", "grey");
-            polygon.setAttribute("fill", "white");
+            if (!elementsExist) {
+                let polygon = document.createElementNS(SVG_NAMESPACE, "polygon");
+                polygon.setAttribute("points", points.map(p => p.join(",")).join(" "));
+                polygon.setAttribute("stroke", "#9E9E9E");
+                polygon.setAttribute("fill", "white");
+                polygon.setAttribute("stroke-linejoin", "round");
 
-            g.appendChild(polygon);
+                g.appendChild(polygon);
 
-            let circleX = centerX + (triangle.center[0] / triangle.center[2]) * size;
-            let circleY = centerY - (triangle.center[1] / triangle.center[2]) * size;
-            let circle = document.createElementNS(SVG_NAMESPACE, "circle");
-            circle.setAttribute("cx", circleX);
-            circle.setAttribute("cy", circleY);
-            circle.setAttribute("r", "1px"); // Radius of the circle
-            circle.setAttribute("fill", "white"); // Fill color of the circle
-            circle.setAttribute("stroke", "grey"); // Stroke color of the circle
+                let circleX = centerX + (triangle.center[0] / triangle.center[2]) * size;
+                let circleY = centerY - (triangle.center[1] / triangle.center[2]) * size;
+                let circle = document.createElementNS(SVG_NAMESPACE, "circle");
+                circle.setAttribute("cx", circleX);
+                circle.setAttribute("cy", circleY);
+                circle.setAttribute("r", "1px"); // Radius of the circle
+                circle.setAttribute("fill", "white"); // Fill color of the circle
+                circle.setAttribute("stroke", "#9E9E9E"); // Stroke color of the circle
 
-            g.appendChild(circle);
+                g.appendChild(circle);
+            } else {
+                let polygon = g.children[idx * 2];
+                polygon.setAttribute("points", points.map(p => p.join(",")).join(" "));
+                let circle = g.children[idx * 2 + 1];
+                let circleX = centerX + (triangle.center[0] / triangle.center[2]) * size;
+                let circleY = centerY - (triangle.center[1] / triangle.center[2]) * size;
+                circle.setAttribute("cx", circleX);
+                circle.setAttribute("cy", circleY);
+            }
+            idx++;
         });
+
+        elementsExist = true;
     }
 }
 
