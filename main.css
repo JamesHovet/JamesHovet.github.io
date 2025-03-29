@@ -1,19 +1,22 @@
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
     padding-left: 2em;
 }
 
 .name {
     margin-bottom: 10px;
+    font-family: "InterDisplay", sans-serif;
+    font-weight: 700;
 }
 
 h1 {
-    font-size: 6em;
+    font-size: 6rem;
 }
 
 .links {
-    font-size: 5em;
-    line-height: 1.5em;
+    font-size: 5rem;
+    line-height: 1.4em;
+    font-family: "InterDisplay", sans-serif;
 }
 
 a {
@@ -35,4 +38,18 @@ a {
     left: 10px;
     padding-left: -10px;
     color: #222;
+}
+
+#content {
+    padding-left: 2em;
+    margin: 8px;
+}
+
+#backgroundSvg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
 }
