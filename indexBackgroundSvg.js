@@ -5,10 +5,12 @@ let startTime;
 let stop = false;
 let fps = 60;
 let fpsInterval = 1000 / fps;
-let then;
+let then = window.performance.now();
 let now;
 let elementsExist = false;
 let g = null;
+let originalStartTime = then;
+let totalElapsed = 0;
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 window.onload = function() {
@@ -20,9 +22,6 @@ body.onresize = function() {
 }
 
 function render(timestamp) {
-    if (!startTime) {
-        startTime = timestamp;
-    }
     if (stop) {
         return;
     }
@@ -30,10 +29,11 @@ function render(timestamp) {
     requestAnimationFrame(render);
 
     now = timestamp;
-    const elapsed = now - startTime;
+    const elapsed = now - then;
 
     if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval); // Reset the start time for the next interval
+        totalElapsed += elapsed;
 
         svg.setAttribute("width", body.clientWidth);
         svg.setAttribute("height", body.clientHeight);
@@ -55,7 +55,7 @@ function render(timestamp) {
 
         let size = Math.min(body.clientWidth, body.clientHeight) / 3;
 
-        let rotationTheta = elapsed * 0.0001; // Rotation speed (radians per millisecond)
+        let rotationTheta = totalElapsed * 0.0001; // Rotation speed (radians per millisecond)
 
         let rotation = mat4.fromRotation(mat4.create(), rotationTheta, [0, 1, 0]);
 
