@@ -9,7 +9,6 @@ let then = window.performance.now();
 let now;
 let elementsExist = false;
 let g = null;
-let originalStartTime = then;
 let totalElapsed = 0;
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";

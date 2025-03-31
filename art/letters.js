@@ -8,8 +8,9 @@ let startTime;
 let stop = false;
 let fps = 30;
 let fpsInterval = 1000 / fps;
-let then;
+let then = window.performance.now();
 let now;
+let totalElapsed = 0;
 
 window.onload = function() {
     render(window.performance.now());
@@ -19,10 +20,26 @@ svg.onresize = function() {
     render(window.performance.now());
 }
 
+const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+let lettersIndex = -1; // Start with the first letter
+
+let currentPositionInitialized = false;
+let currX = 0;
+let currY = 0;
+let oldX = 0;
+let oldY = 0;
+let direction_radians = 0;
+
+let lines_to_draw = 10000;
+let lines_drawn = 0;
+let walk_magnitude = (10.0 / 600.0) * svg.clientWidth; // The distance to move in each step
+let lines_to_draw_per_frame = 100;
+let time_to_wait_until = 0;
+
+
+let g = null;
+
 function render(timestamp) {
-    if (!startTime) {
-        startTime = timestamp;
-    }
     if (stop) {
         return;
     }
@@ -30,10 +47,19 @@ function render(timestamp) {
     requestAnimationFrame(render);
 
     now = timestamp;
-    const elapsed = now - startTime;
+    const elapsed = now - then;
+
+    function drawLetter(ctx, centerX, centerY) {
+        ctx.font = "bold 650px 'Times New Roman'";
+        ctx.fillStyle = "black"; // Set the fill color to black
+        ctx.textAlign = "center"; // Center the text horizontally
+        ctx.textBaseline = "middle"; // Center the text vertically
+        ctx.fillText(letters[lettersIndex], centerX, centerY); // Draw the letter A at the center of the canvas
+    }
 
     if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval); // Reset the start time for the next interval
+        totalElapsed += elapsed;
 
         svg.setAttribute("width", svg.clientWidth);
         svg.setAttribute("height", svg.clientHeight);
@@ -46,54 +72,96 @@ function render(timestamp) {
         canvas.setAttribute("width", svg.clientWidth);
         canvas.setAttribute("height", svg.clientHeight);
         // Clear the canvas
-        let ctx = canvas.getContext("2d");
+        let ctx = canvas.getContext("2d", {willReadFrequently: true});
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         let centerX = svg.clientWidth / 2;
         let centerY = svg.clientHeight / 2;
 
-        // Clear previous content
-        while (svg.firstChild) {
-            svg.removeChild(svg.firstChild);
-        }
+        if (!currentPositionInitialized || lines_drawn >= lines_to_draw) {
+            lettersIndex = (lettersIndex + 1) % letters.length; // Move to the next letter
 
-        let g = document.createElementNS(SVG_NAMESPACE, "g");
-        svg.appendChild(g);
+            drawLetter(ctx, centerX, centerY);
 
-        let canvasCircleCenterX = centerX + Math.sin(elapsed * 0.0001) * (Math.min(svg.clientWidth, svg.clientHeight) / 3);
-        let canvasCircleCenterY = centerY + Math.cos(elapsed * 0.0001) * (Math.min(svg.clientWidth, svg.clientHeight) / 3);
-        ctx.beginPath();
-        ctx.arc(canvasCircleCenterX, canvasCircleCenterY, Math.min(svg.clientWidth, svg.clientHeight) / 6, 0, 2 * Math.PI);
-        ctx.closePath();
-        ctx.strokeStyle = "black";
-        ctx.fill();
-
-        // draw a grid of 75 x 60 circles spread evenly across the entire svg ares
-        let numRows = 75;
-        let numCols = 60;
-        let circleRadius = 3; // Radius of each circle
-        let circleSpacingX = (svg.clientWidth - 2 * circleRadius) / (numCols - 1);
-        let circleSpacingY = (svg.clientHeight - 2 * circleRadius) / (numRows - 1);
-        for (let row = 0; row < numRows; row++) {
-            for (let col = 0; col < numCols; col++) {
-                let x = circleRadius + col * circleSpacingX;
-                let y = circleRadius + row * circleSpacingY;
-                let circle = document.createElementNS(SVG_NAMESPACE, "circle");
-                circle.setAttribute("cx", x);
-                circle.setAttribute("cy", y);
-                circle.setAttribute("r", circleRadius);
-
-                // get the color from the canvas at this position
-                let imageData = ctx.getImageData(x - circleRadius, y - circleRadius, circleRadius * 2, circleRadius * 2);
-                if (imageData.data[3] === 0) {
-                    // if the circle is transparent, make it white
-                    circle.setAttribute("fill", "blue");
-                } else {
-                    circle.setAttribute("fill", "red");
-                }
-
-                g.appendChild(circle);
+            // Clear previous content
+            while (svg.firstChild) {
+                svg.removeChild(svg.firstChild);
             }
+
+            g = document.createElementNS(SVG_NAMESPACE, "g");
+            svg.appendChild(g);
+            lines_drawn = 0;
+
+            while (true) {
+                let newX = Math.random() * svg.clientWidth; // Random X position within the canvas
+                let newY = Math.random() * svg.clientHeight; // Random Y position within the canvas
+                // Check if the new position is within a black pixel on the canvas
+                let imageData = ctx.getImageData(newX, newY, 1, 1).data;
+                let isOnTopOfBlack = !(imageData[3] === 0); // Check if the pixel is not transparent
+                if (isOnTopOfBlack) {
+                    currX = newX;
+                    currY = newY;
+                    break; // Found a valid starting position
+                }
+            }
+            oldX = currX;
+            oldY = currY;
+            direction_radians = Math.random() * 2 * Math.PI; // Random initial direction
+
+            currentPositionInitialized = true;
+            return;
         }
+
+        drawLetter(ctx, centerX, centerY); // Draw the current letter at the current position
+
+        for (let i = 0; i < lines_to_draw_per_frame; i++) {
+            let tries = 0;
+            while (true) {
+                let new_direction = gauss(direction_radians, Math.PI / 4); // Random direction with some noise
+                let newX = currX + Math.cos(new_direction) * walk_magnitude; // Move in the new direction
+                let newY = currY + Math.sin(new_direction) * walk_magnitude; // Move in the new direction
+                // Check if the new position is within a black pixel on the canvas
+                let imageData = ctx.getImageData(newX, newY, 1, 1).data;
+                let isOnTopOfBlack = !(imageData[3] === 0);
+                if (isOnTopOfBlack) {
+                    oldX = currX;
+                    oldY = currY;
+                    currX = newX;
+                    currY = newY;
+                    direction_radians = new_direction; // Update the direction
+                    break;
+                }
+                tries++;
+                if (tries > 100) {
+                    direction_radians = gauss(direction_radians, Math.PI / 2); // If too many tries, change direction significantly
+                }
+                if (tries > 500) {
+                    console.log("Too many tries, stopping the walk.");
+                    stop = true; // Stop the walk if we can't find a valid position
+                    return;
+                }
+            }
+
+            // draw the line on the svg
+            let line = document.createElementNS(SVG_NAMESPACE, "line");
+            line.setAttribute("x1", oldX);
+            line.setAttribute("y1", oldY);
+            line.setAttribute("x2", currX);
+            line.setAttribute("y2", currY);
+            line.setAttribute("stroke", "black");
+            g.appendChild(line);
+
+            lines_drawn += 1;
+        }
+    } else {
+        console.log("waiting");
     }
+}
+
+function gauss(mean, stddev) {
+    let u1 = 1 - Math.random(); // Uniform(0,1) random doubles
+    let u2 = 1 - Math.random();
+    let randStdNormal = Math.sqrt(-2.0 * Math.log(u1)) *
+        Math.sin(2.0 * Math.PI * u2); // Box-Muller transform
+    return mean + stddev * randStdNormal; // Transform to desired mean and stddev
 }
