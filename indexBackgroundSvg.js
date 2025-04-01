@@ -10,9 +10,55 @@ let now;
 let elementsExist = false;
 let g = null;
 let totalElapsed = 0;
+let thisParamSet = 0;
+
+class ParamSet {
+    constructor(triSortingFunction, rotationSpeed = 0.00007) {
+        this.triSortingFunction = triSortingFunction;
+        this.rotationSpeed = rotationSpeed;
+    }
+}
+
+paramSets = [
+    /**
+     * Sort by the dot product of the triangle with to (0, -1, 0)
+     */
+    new ParamSet((tris, totalElapsed) => {
+        let down = vec3.fromValues(0, -1, 0);
+        tris.sort((a, b) => {
+            let aCenterDot = vec3.dot(a.center, down);
+            let bCenterDot = vec3.dot(b.center, down);
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }, 0.00007),
+    /**
+     * Sort by the distance to (0, 0, 0)
+     */
+    new ParamSet((tris, totalElapsed) => {
+        let target = vec3.fromValues(0, 0, 0);
+        tris.sort((a, b) => {
+            let aCenterDist = vec3.distance(a.center, target);
+            let bCenterDist = vec3.distance(b.center, target);
+            return aCenterDist - bCenterDist; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }),
+    /**
+     * Sort by the dot product similarity between (cos(t), sin(t), 0) and the triangle normal
+     */
+    new ParamSet((tris, totalElapsed) => {
+        let target = vec3.fromValues(Math.cos(totalElapsed * 0.001), Math.sin(totalElapsed * 0.001), 0); // Down direction for sorting
+        tris.sort((a, b) => {
+            let aCenterDot = vec3.dot(a.normal, target);
+            let bCenterDot = vec3.dot(b.normal, target);
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }, 0.00005),
+];
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 window.onload = function() {
+    thisParamSet = Math.round(window.performance.now()) % paramSets.length;
+    console.log(thisParamSet);
     render(window.performance.now());
 };
 
@@ -36,7 +82,7 @@ function render(timestamp) {
 
         svg.setAttribute("width", body.clientWidth);
         svg.setAttribute("height", body.clientHeight);
-        svg.setAttribute("stroke-width", "0.03rem");
+        svg.setAttribute("stroke-width", "0.05rem");
 
         // Update the viewBox to match the new width and height
         let viewBox = `0 0 ${body.clientWidth} ${body.clientHeight}`;
@@ -54,12 +100,12 @@ function render(timestamp) {
 
         let size = Math.min(body.clientWidth, body.clientHeight) / 3;
 
-        let rotationTheta = totalElapsed * 0.0001; // Rotation speed (radians per millisecond)
+        let rotationTheta = totalElapsed * paramSets[thisParamSet].rotationSpeed;
 
         let rotation = mat4.fromRotation(mat4.create(), rotationTheta, [0, 1, 0]);
 
-        let projection = mat4.perspective(mat4.create(), Math.PI / 8, 1, 0.1, 100);
-        let eye = vec3.fromValues(0, 0, 10); // Eye position
+        let projection = mat4.perspective(mat4.create(), Math.PI / 50, 1, 0.1, 100);
+        let eye = vec3.fromValues(0, 0, 50); // Eye position
         let target = vec3.fromValues(0, 0, 0); // Look at the origin
         let up = vec3.fromValues(0, 1, 0); // Up direction
         let view = mat4.lookAt(mat4.create(), eye, target, up);
@@ -73,12 +119,7 @@ function render(timestamp) {
             return new MyTriangle(vertex1, vertex2, vertex3);
         });
 
-        let down = vec3.fromValues(0, -1, 0); // Down direction for sorting
-        tris.sort((a, b) => {
-            let aCenterDot = vec3.dot(a.center, down);
-            let bCenterDot = vec3.dot(b.center, down);
-            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
-        });
+        paramSets[thisParamSet].triSortingFunction(tris, totalElapsed);
 
         let idx = 0;
         tris.forEach(triangle => {
