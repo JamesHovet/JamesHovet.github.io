@@ -140,6 +140,16 @@ function undoShowMore() {
     links.hidden = false;
 }
 
+function handleBackgroundButton() {
+    let backgroundButton = document.getElementById("backgroundButton");
+    if (backgroundButton.checked) {
+        document.body.setAttribute("style", "background-color: black;");
+    } else {
+        document.body.setAttribute("style", "background-color: white;");
+    }
+    document.body.setAttribute("style", "color: " + (backgroundButton.checked ? "white" : "black") + ";");
+}
+
 body.onresize = function() {
     render(window.performance.now());
 }
@@ -232,6 +242,7 @@ function render(timestamp) {
 
                 let colorCheckbox = document.getElementById("showColor");
                 let hueCheckbox = document.getElementById("showHue");
+                let invertCheckbox = document.getElementById("invert");
                 let originalCenter = triangle.original.center; // vec3
 
                 let hue = 0;
@@ -248,6 +259,10 @@ function render(timestamp) {
 
                 if (colorCheckbox.checked) {
                     lightness = map(idx, 0, tris.length, 100, 0);
+                }
+
+                if (invertCheckbox.checked) {
+                    lightness = 100 - lightness;
                 }
 
                 polygon.setAttribute("fill", "hsl(" + hue + ", " + saturation + "%, " + lightness + "%)")

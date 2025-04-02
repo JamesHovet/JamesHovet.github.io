@@ -42,10 +42,22 @@
         </div>
         <span id="showMoreButton" onclick="showMore()">(Show More)</span>
         <form id="moreControls" hidden>
+            <span style="white-space: nowrap">
             <input type="checkbox" id="showColor" name="showColor" value="showColor">
             <label for="showColor">Color</label>
+            </span>
+            <span style="white-space: nowrap">
             <input type="checkbox" id="showHue" name="showHue" value="showHue">
             <label for="showHue">Hue</label>
+            </span>
+            <span style="white-space: nowrap">
+            <input type="checkbox" id="invert" name="invert" value="invert">
+            <label for="invert">Invert</label>
+            </span>
+            <span style="white-space: nowrap">
+            <input type="checkbox" id="backgroundButton" name="backgroundButton" value="backgroundButton" onchange="handleBackgroundButton()">
+            <label for="backgroundButton">Background</label>
+            </span>
             <br>
             <span onclick="undoShowMore()">Return</span>
         </form>
