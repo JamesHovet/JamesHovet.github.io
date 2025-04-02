@@ -12,29 +12,32 @@ let g = null;
 let totalElapsed = 0;
 let thisParamSet = 0;
 
+
 class ParamSet {
-    constructor(triSortingFunction, rotationSpeed = 0.00007) {
+    constructor(name, triSortingFunction) {
+        this.name = name;
         this.triSortingFunction = triSortingFunction;
-        this.rotationSpeed = rotationSpeed;
     }
 }
 
 paramSets = [
-    /**
-     * Sort by the dot product of the triangle with to (0, -1, 0)
-     */
-    new ParamSet((tris, totalElapsed) => {
+    new ParamSet("MovingTarget", (tris, totalElapsed) => {
+        let target = vec3.fromValues(Math.cos(totalElapsed * 0.0007), Math.sin(totalElapsed * 0.0007), 0); // Down direction for sorting
+        tris.sort((a, b) => {
+            let aCenterDot = vec3.dot(a.normal, target);
+            let bCenterDot = vec3.dot(b.normal, target);
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }),
+    new ParamSet("Downness", (tris, totalElapsed) => {
         let down = vec3.fromValues(0, -1, 0);
         tris.sort((a, b) => {
             let aCenterDot = vec3.dot(a.center, down);
             let bCenterDot = vec3.dot(b.center, down);
             return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
         });
-    }, 0.00007),
-    /**
-     * Sort by the distance to (0, 0, 0)
-     */
-    new ParamSet((tris, totalElapsed) => {
+    }),
+    new ParamSet("Centerness", (tris, totalElapsed) => {
         let target = vec3.fromValues(0, 0, 0);
         tris.sort((a, b) => {
             let aCenterDist = vec3.distance(a.center, target);
@@ -42,25 +45,48 @@ paramSets = [
             return aCenterDist - bCenterDist; // Sort by the dot product with the up vector (Y-axis)
         });
     }),
-    /**
-     * Sort by the dot product similarity between (cos(t), sin(t), 0) and the triangle normal
-     */
-    new ParamSet((tris, totalElapsed) => {
-        let target = vec3.fromValues(Math.cos(totalElapsed * 0.001), Math.sin(totalElapsed * 0.001), 0); // Down direction for sorting
+    new ParamSet("BackToFront", (tris, totalElapsed) => {
+        let target = vec3.fromValues(0, 0, -1);
         tris.sort((a, b) => {
-            let aCenterDot = vec3.dot(a.normal, target);
-            let bCenterDot = vec3.dot(b.normal, target);
+            let aCenterDot = vec3.dot(a.center, target);
+            let bCenterDot = vec3.dot(b.center, target);
             return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
         });
-    }, 0.00005),
+    }),
+    new ParamSet("FrontToBack", (tris, totalElapsed) => {
+        let target = vec3.fromValues(0, 0, 1);
+        tris.sort((a, b) => {
+            let aCenterDot = vec3.dot(a.center, target);
+            let bCenterDot = vec3.dot(b.center, target);
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }),
 ];
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 window.onload = function() {
-    thisParamSet = Math.round(window.performance.now()) % paramSets.length;
-    console.log(thisParamSet);
+    thisParamSet = 0;
+    document.getElementById("currentAlgorithm").innerText = paramSets[thisParamSet].name;
     render(window.performance.now());
 };
+
+function handleLeftArrow() {
+    thisParamSet = (thisParamSet - 1 + paramSets.length) % paramSets.length;
+    document.getElementById("currentAlgorithm").innerText = paramSets[thisParamSet].name;
+}
+
+function handleRightArrow() {
+    thisParamSet = (thisParamSet + 1) % paramSets.length;
+    document.getElementById("currentAlgorithm").innerText = paramSets[thisParamSet].name;
+}
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "ArrowLeft") {
+        handleLeftArrow();
+    } else if (event.key === "ArrowRight") {
+        handleRightArrow();
+    }
+});
 
 body.onresize = function() {
     render(window.performance.now());
@@ -100,7 +126,7 @@ function render(timestamp) {
 
         let size = Math.min(body.clientWidth, body.clientHeight) / 3;
 
-        let rotationTheta = totalElapsed * paramSets[thisParamSet].rotationSpeed;
+        let rotationTheta = totalElapsed * 0.00005; // Rotation speed
 
         let rotation = mat4.fromRotation(mat4.create(), rotationTheta, [0, 1, 0]);
 
@@ -151,6 +177,14 @@ function render(timestamp) {
             } else {
                 let polygon = g.children[idx * 2];
                 polygon.setAttribute("points", points.map(p => p.join(",")).join(" "));
+
+                let colorCheckbox = document.getElementById("showColor");
+                if (colorCheckbox.checked) {
+                    polygon.setAttribute("fill", "hsl(0, 0%, " + map(idx, 0, tris.length, 100, 0) + "%)");
+                } else {
+                    polygon.setAttribute("fill", "white");
+                }
+
                 let circle = g.children[idx * 2 + 1];
                 let circleX = centerX + (triangle.center[0] / triangle.center[2]) * size;
                 let circleY = centerY - (triangle.center[1] / triangle.center[2]) * size;
@@ -162,6 +196,10 @@ function render(timestamp) {
 
         elementsExist = true;
     }
+}
+
+function map(value, start1, stop1, start2, stop2) {
+    return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
 }
 
 requestAnimationFrame(render);
