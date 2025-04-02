@@ -11,7 +11,12 @@ let elementsExist = false;
 let g = null;
 let totalElapsed = 0;
 let thisParamSet = 0;
+let draggable = false;
 
+let offsetFromDragX = 0;
+let offsetFromDragY = 0;
+let accumulatingRotationX = 0;
+let accumulatingRotationY = 0;
 
 class ParamSet {
     constructor(name, triSortingFunction) {
@@ -22,7 +27,7 @@ class ParamSet {
 
 paramSets = [
     new ParamSet("MovingTarget", (tris, totalElapsed) => {
-        let target = vec3.fromValues(Math.cos(totalElapsed * 0.0007), Math.sin(totalElapsed * 0.0007), 0); // Down direction for sorting
+        let target = vec3.fromValues(Math.cos(totalElapsed * 0.0005), Math.sin(totalElapsed * 0.0005), 0); // Down direction for sorting
         tris.sort((a, b) => {
             let aCenterDot = vec3.dot(a.normal, target);
             let bCenterDot = vec3.dot(b.normal, target);
@@ -62,6 +67,9 @@ paramSets = [
             let bCenterDist = vec3.distance(b.center, target);
             return aCenterDist - bCenterDist; // Sort by the dot product with the up vector (Y-axis)
         });
+    }),
+    new ParamSet("ModelOrder", (tris, totalElapsed) => {
+        // no sorting needed
     }),
     new ParamSet("RightToLeft", (tris, totalElapsed) => {
         let target = vec3.fromValues(-1, 0, 0);
@@ -129,6 +137,11 @@ function showMore() {
     showMoreButton.hidden = true;
     let links = document.getElementById("links");
     links.hidden = true;
+
+    draggable = true;
+    svg.setAttribute("style", "z-index: auto;"); // Ensure the SVG is on top for dragging
+
+    svg.addEventListener("mousedown", svgMousedownListener);
 }
 
 function undoShowMore() {
@@ -138,16 +151,62 @@ function undoShowMore() {
     showMoreButton.hidden = false;
     let links = document.getElementById("links");
     links.hidden = false;
+
+    svg.setAttribute("style", "z-index: -1;"); // Reset z-index to default when hiding more controls
+
+    let backgroundButton = document.getElementById("backgroundButton");
+    backgroundButton.checked = false; // Reset background to white when hiding more controls
+    handleBackgroundButton();
+
+    draggable = false;
+
+    svg.removeEventListener("mousedown", svgMousedownListener);
 }
 
 function handleBackgroundButton() {
     let backgroundButton = document.getElementById("backgroundButton");
     if (backgroundButton.checked) {
-        document.body.setAttribute("style", "background-color: black;");
+        svg.setAttribute("style", "background-color: black;");
     } else {
-        document.body.setAttribute("style", "background-color: white;");
+        svg.setAttribute("style", "background-color: none;");
     }
-    document.body.setAttribute("style", "color: " + (backgroundButton.checked ? "white" : "black") + ";");
+    document.body.setAttribute("style", "color: " + (backgroundButton.checked ? "white" : "auto") + ";");
+}
+
+
+function svgMousedownListener (event) {
+    if (draggable) {
+        let offsetX = event.clientX - svg.getBoundingClientRect().left;
+        let offsetY = event.clientY - svg.getBoundingClientRect().top;
+        let originalOffsetFromDragX = offsetFromDragX;
+        let originalOffsetFromDragY = offsetFromDragY;
+        let rotDirection = null
+
+        function drag(event) {
+            let x = event.clientX - offsetX;
+            let y = event.clientY - offsetY;
+            if (rotDirection == null && Math.max(Math.abs(x), Math.abs(y)) > 10) {
+                if (Math.abs(x) > Math.abs(y)) {
+                    rotDirection = "x"; // More horizontal movement, adjust X rotation
+                } else {
+                    rotDirection = "y"; // More vertical movement, adjust Y rotation
+                }
+            }
+            if (rotDirection === "x") {
+                offsetFromDragX = originalOffsetFromDragX - x * 0.001; // Adjust X rotation based on mouse movement
+            } else {
+                offsetFromDragY = originalOffsetFromDragY - y * 0.001;
+            }
+        }
+
+        function drop() {
+            document.removeEventListener("mousemove", drag);
+            document.removeEventListener("mouseup", drop);
+        }
+
+        document.addEventListener("mousemove", drag);
+        document.addEventListener("mouseup", drop);
+    }
 }
 
 body.onresize = function() {
@@ -188,9 +247,20 @@ function render(timestamp) {
 
         let size = Math.min(body.clientWidth, body.clientHeight) / 3;
 
-        let rotationTheta = totalElapsed * 0.00005; // Rotation speed
+        if (document.getElementById("rotate").checked) {
+            accumulatingRotationX += elapsed * 0.00005;
+        }
+        if (document.getElementById("rotateY").checked) {
+            accumulatingRotationY += elapsed * 0.00005;
+        }
 
-        let rotation = mat4.fromRotation(mat4.create(), rotationTheta, [0, 1, 0]);
+        let rotationTheta = offsetFromDragX + accumulatingRotationX; // Rotation speed
+
+        let rotationX = mat4.fromRotation(mat4.create(), rotationTheta, [0, 1, 0]);
+
+        let rotateY = mat4.fromRotation(mat4.create(), offsetFromDragY + accumulatingRotationY, [1, 0, 0]);
+
+        let rotation = mat4.multiply(mat4.create(), rotationX, rotateY);
 
         let projection = mat4.perspective(mat4.create(), Math.PI / 50, 1, 0.1, 100);
         let eye = vec3.fromValues(0, 0, 50); // Eye position
