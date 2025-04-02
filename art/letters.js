@@ -30,9 +30,9 @@ let oldX = 0;
 let oldY = 0;
 let direction_radians = 0;
 
-let lines_to_draw = 10000;
+let lines_to_draw = 8000;
 let lines_drawn = 0;
-let walk_magnitude = (10.0 / 600.0) * svg.clientWidth; // The distance to move in each step
+let walk_magnitude = (5.0 / 600.0) * svg.clientWidth; // The distance to move in each step
 let lines_to_draw_per_frame = 100;
 let time_to_wait_until = 0;
 
