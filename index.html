@@ -25,7 +25,7 @@
         <div class="nameDiv">
             <h1 class="name"> James Hovet </h1>
         </div>
-        <div class="links">
+        <div id="links" class="links">
             <div><a href="/portfolio/">Lighting Design</a></div>
             <div><a href="/art/">Procedural Art</a></div>
             <div><a href="/projects.html">Projects</a></div>
@@ -33,14 +33,21 @@
         </div>
     </div>
     <div id="selector">
-        <span id="algorithmTitle">Triangle Sorting Algorithm:</span>
-        <br>
-        <a id="leftArrow" onclick="handleLeftArrow()"><-</a>
-        <span id="currentAlgorithm"></span>
-        <a id="rightArrow" onclick="handleRightArrow()">-></a>
-        <form>
+        <div style="margin-bottom: 0.5rem">
+            <span id="algorithmTitle">Triangle Ordering Algorithm:</span>
+            <br>
+            <a id="leftArrow" onclick="handleLeftArrow()"><-</a>
+            <span id="currentAlgorithm"></span>
+            <a id="rightArrow" onclick="handleRightArrow()">-></a>
+        </div>
+        <span id="showMoreButton" onclick="showMore()">(Show More)</span>
+        <form id="moreControls" hidden>
             <input type="checkbox" id="showColor" name="showColor" value="showColor">
             <label for="showColor">Color</label>
+            <input type="checkbox" id="showHue" name="showHue" value="showHue">
+            <label for="showHue">Hue</label>
+            <br>
+            <span onclick="undoShowMore()">Return</span>
         </form>
     </div>
 </body>

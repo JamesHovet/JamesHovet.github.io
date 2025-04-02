@@ -29,7 +29,7 @@ paramSets = [
             return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
         });
     }),
-    new ParamSet("Downness", (tris, totalElapsed) => {
+    new ParamSet("TopToBottom", (tris, totalElapsed) => {
         let down = vec3.fromValues(0, -1, 0);
         tris.sort((a, b) => {
             let aCenterDot = vec3.dot(a.center, down);
@@ -37,12 +37,46 @@ paramSets = [
             return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
         });
     }),
-    new ParamSet("Centerness", (tris, totalElapsed) => {
+    new ParamSet("Equatorial", (tris, totalElapsed) => {
+        let targetOne = vec3.fromValues(0, 1, 0);
+        let targetTwo = vec3.fromValues(0, -1, 0);
+        tris.sort((a, b) => {
+            let aCenterDot = Math.min(vec3.dot(a.center, targetOne), vec3.dot(a.center, targetTwo));
+            let bCenterDot = Math.min(vec3.dot(b.center, targetOne), vec3.dot(b.center, targetTwo));
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }),
+    new ParamSet("Antipodes", (tris, totalElapsed) => {
+        let targetOne = vec3.fromValues(1, 0, 0);
+        let targetTwo = vec3.fromValues(-1, 0, 0);
+        tris.sort((a, b) => {
+            let aCenterDot = Math.min(vec3.dot(a.center, targetOne), vec3.dot(a.center, targetTwo));
+            let bCenterDot = Math.min(vec3.dot(b.center, targetOne), vec3.dot(b.center, targetTwo));
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }),
+    new ParamSet("CenterOut", (tris, totalElapsed) => {
         let target = vec3.fromValues(0, 0, 0);
         tris.sort((a, b) => {
             let aCenterDist = vec3.distance(a.center, target);
             let bCenterDist = vec3.distance(b.center, target);
             return aCenterDist - bCenterDist; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }),
+    new ParamSet("RightToLeft", (tris, totalElapsed) => {
+        let target = vec3.fromValues(-1, 0, 0);
+        tris.sort((a, b) => {
+            let aCenterDot = vec3.dot(a.center, target);
+            let bCenterDot = vec3.dot(b.center, target);
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
+        });
+    }),
+    new ParamSet("LeftToRight", (tris, totalElapsed) => {
+        let target = vec3.fromValues(1, 0, 0);
+        tris.sort((a, b) => {
+            let aCenterDot = vec3.dot(a.center, target);
+            let bCenterDot = vec3.dot(b.center, target);
+            return aCenterDot - bCenterDot; // Sort by the dot product with the up vector (Y-axis)
         });
     }),
     new ParamSet("BackToFront", (tris, totalElapsed) => {
@@ -87,6 +121,24 @@ document.addEventListener("keydown", function(event) {
         handleRightArrow();
     }
 });
+
+function showMore() {
+    let moreControls = document.getElementById("moreControls");
+    moreControls.hidden = false;
+    let showMoreButton = document.getElementById("showMoreButton");
+    showMoreButton.hidden = true;
+    let links = document.getElementById("links");
+    links.hidden = true;
+}
+
+function undoShowMore() {
+    let moreControls = document.getElementById("moreControls");
+    moreControls.hidden = true;
+    let showMoreButton = document.getElementById("showMoreButton");
+    showMoreButton.hidden = false;
+    let links = document.getElementById("links");
+    links.hidden = false;
+}
 
 body.onresize = function() {
     render(window.performance.now());
@@ -142,7 +194,7 @@ function render(timestamp) {
             let vertex1 = vec3.transformMat4(vec3.create(), triangle._1, modelViewProjection);
             let vertex2 = vec3.transformMat4(vec3.create(), triangle._2, modelViewProjection);
             let vertex3 = vec3.transformMat4(vec3.create(), triangle._3, modelViewProjection);
-            return new MyTriangle(vertex1, vertex2, vertex3);
+            return new MyTriangle(vertex1, vertex2, vertex3, triangle);
         });
 
         paramSets[thisParamSet].triSortingFunction(tris, totalElapsed);
@@ -179,11 +231,26 @@ function render(timestamp) {
                 polygon.setAttribute("points", points.map(p => p.join(",")).join(" "));
 
                 let colorCheckbox = document.getElementById("showColor");
-                if (colorCheckbox.checked) {
-                    polygon.setAttribute("fill", "hsl(0, 0%, " + map(idx, 0, tris.length, 100, 0) + "%)");
-                } else {
-                    polygon.setAttribute("fill", "white");
+                let hueCheckbox = document.getElementById("showHue");
+                let originalCenter = triangle.original.center; // vec3
+
+                let hue = 0;
+                let saturation = 0;
+                let lightness = 100;
+
+                if (hueCheckbox.checked) {
+                    hue = Math.floor((Math.atan2(originalCenter[1], originalCenter[0]) + Math.PI) / (2 * Math.PI) * 360);
+                    saturation = 100;
+                    if (!colorCheckbox.checked) {
+                        lightness = 50;
+                    }
                 }
+
+                if (colorCheckbox.checked) {
+                    lightness = map(idx, 0, tris.length, 100, 0);
+                }
+
+                polygon.setAttribute("fill", "hsl(" + hue + ", " + saturation + "%, " + lightness + "%)")
 
                 let circle = g.children[idx * 2 + 1];
                 let circleX = centerX + (triangle.center[0] / triangle.center[2]) * size;

@@ -2,10 +2,11 @@ const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;
 
 class MyTriangle {
-    constructor(_1, _2, _3) {
+    constructor(_1, _2, _3, original = null) {
         this._1 = _1; // vec3
         this._2 = _2; // vec3
         this._3 = _3; // vec3
+        this.original = original;
 
         let edge1 = vec3.subtract(vec3.create(), this._2, this._1);
         let edge2 = vec3.subtract(vec3.create(), this._3, this._1);

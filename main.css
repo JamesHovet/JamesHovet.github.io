@@ -47,6 +47,10 @@ body {
     #selector {
         font-size: 1rem;
     }
+
+    #showMoreButton {
+        font-size: 0.7rem;
+    }
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
@@ -66,6 +70,10 @@ body {
 
     #selector {
         font-size: 1.5rem;
+    }
+
+    #showMoreButton {
+        font-size: 1rem;
     }
 }
 
